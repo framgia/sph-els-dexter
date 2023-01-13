@@ -1,6 +1,7 @@
-import {Schema} from "mongoose";
+import {Schema, model} from "mongoose";
+import {IUser} from "./../types"
 
-export const userSchema = new Schema({
+const schema = new Schema<IUser>({
   name: String,
   avatar: String,
   email: String,
@@ -18,3 +19,5 @@ export const userSchema = new Schema({
     default: Date.now()
   }
 })
+
+export const User = model<IUser>('User', schema)
