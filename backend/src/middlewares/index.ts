@@ -1,3 +1,4 @@
 import {router} from "./router"
+import {upload} from "./multer"
 
-export {router}
+export {router, upload}

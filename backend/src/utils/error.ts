@@ -1,4 +1,5 @@
 import {Response} from "express"
+import {EHttpStatusCode} from "./../enums"
 
 export class ErrorException extends Error {
   code: number
@@ -6,7 +7,7 @@ export class ErrorException extends Error {
 
   constructor(
     message: string = "Internal Server Error",
-    code: number = 500
+    code: number = EHttpStatusCode.INTERNAL_SERVER_ERROR
   ) {
     super()
 
@@ -18,7 +19,7 @@ export class ErrorException extends Error {
 export const respondError = (error: unknown, res: Response): void => {
   const err: ErrorException = error as ErrorException
 
-  res.status(err.code || 500).send({
+  res.status(err.code || EHttpStatusCode.INTERNAL_SERVER_ERROR).send({
     message: err.message || "Internal Server Error"
   })
 }
