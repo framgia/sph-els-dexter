@@ -1,33 +1,53 @@
 import {Request, Response} from "express"
-import {respondError, ErrorException, hashPassword} from "./../../utils"
-import {IUser} from "./../../types"
-import {User} from "./../../schemas"
-import {EHttpStatusCode} from "./../../enums"
+import {respondError, ErrorException, generateToken} from "./../../utils"
+import {IUser, ITokenBody, IUserSession} from "./../../types"
+import {User, UserSession} from "./../../schemas"
+import {EHttpStatusCode, EToken} from "./../../enums"
+import {S3_DEFAULT_IMAGE} from "./../../configs"
 
 export const UserController = {
   CREATE_USER: async (req: Request, res: Response) => {
     try {
-      const avatar: string | undefined = req.file && (req.file as Express.MulterS3.File).location
-        ? (req.file as Express.MulterS3.File).location
-        : undefined
+      const avatar: string | undefined = S3_DEFAULT_IMAGE
 
       const {name, email, password, role}: IUser = req.body
 
+      if (!name || !email || !password) throw new ErrorException("Name, email or password is missing from payload.")
+
       const data: IUser = {
-        name, email, password,
+        name, email, 
+        password,
         avatar, role
       }
 
-      if (!name || !email || !password) throw new ErrorException("Name, email or password is missing from payload.")
+      const userInstance = new User(data)
 
-      const hashedPassword: string | undefined = hashPassword(password)
+      const userId: string = userInstance.toObject()._id as unknown as string
+      const tokenBody: ITokenBody = {
+        userId, name, email,
+        role: role === 0 ? "student" : "admin"
+      }
+
+      const accessToken: string | null = generateToken(tokenBody, "access")
+      const refreshToken: string | null = generateToken(tokenBody, "refresh")
+
+      const sessionData: IUserSession = {
+        userId, sessionToken: refreshToken ?? ""
+      }
+
+      const userSessionInstance = new UserSession(sessionData)
       
-      if (!hashedPassword) throw new ErrorException("Salt round is not defined from env file.")
+      await Promise.all([
+        userInstance.save(),
+        userSessionInstance.save()
+      ])
 
-      const userData = new User(data)
-
-      await userData.save()
       res.status(EHttpStatusCode.OK).send({
+        data: {
+          accessToken,
+          refreshToken,
+          expiresIn: EToken.EXPIRY
+        },
         message: "You are successfully registered."
       })
     } catch (err) {

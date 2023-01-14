@@ -1,5 +1,5 @@
 import Input from "./Input"
 import Header from "./Header"
-import Preloader from "./Preloader"
+import LoadingIndicator from "./LoadingIndicator"
 
-export {Input, Header, Preloader}
+export {Input, Header, LoadingIndicator}

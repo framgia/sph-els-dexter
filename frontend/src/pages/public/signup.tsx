@@ -1,32 +1,60 @@
 import React, {useState} from "react"
 import {useNavigate} from "react-router-dom"
+import {useDispatch} from "react-redux"
 import {ERouteNames} from "../../enums"
-import {Input, Header, Preloader} from "../../components"
+import {Input, Header, LoadingIndicator} from "../../components"
+import {ISignUp} from "./../../types"
+import {signUp} from "./../../services"
+import {slices} from "./../../redux/slice-collection"
 
 function Signup() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  const [name, setName] = useState<string>()
-  const [email, setEmail] = useState<string>()
-  const [password, setPassword] = useState<string>()
-  const [confirmPassword, setConfirmPassword] = useState<string>()
+  const [name, setName] = useState<string>("")
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
+  const [confirmPassword, setConfirmPassword] = useState<string>("")
 
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitted(true)
 
     if (password !== confirmPassword) {
-      console.error("Password do not match.")
+      return console.error("Password do not match.")
     }
-    navigate(ERouteNames.ROOT_PAGE)
+
+    try {
+      const payload: ISignUp = {name, email, password, role: 0}
+
+      interface ISignupResult {
+        data: {
+          accessToken: string;
+          refreshToken: string;
+          expiresIn: string;
+        };
+        message: string;
+      }
+
+      const {data}: ISignupResult = await signUp(payload)
+      
+      dispatch(slices.user.login({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken
+      }))
+
+      navigate(ERouteNames.DASHBOARD_PAGE)
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
     <div className="h-screen flex">
       <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
-        <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Login here." />
+        <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Click here to login." />
         <form onSubmit={(e) => handleSubmit(e)}>
           <Input 
             hasLabel={true}
@@ -75,7 +103,7 @@ function Signup() {
                 className="bg-sky-800 py-2 px-4 text-sm text-white w-full rounded border hover:bg-sky-900 focus:outline-none focus:border-sky-900"
                 type="submit"
               >
-                {submitted ? <Preloader /> : "Sign Up"}
+                {submitted ? <LoadingIndicator /> : "Sign Up"}
               </button>
             </div>
           </div>

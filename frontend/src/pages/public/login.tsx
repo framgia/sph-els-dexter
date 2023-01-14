@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom"
 import {slices} from "../../redux/slice-collection"
 import {useDispatch} from "react-redux";
 import {ERouteNames} from "../../enums"
-import {Input, Header, Preloader} from "../../components"
+import {Input, Header, LoadingIndicator} from "../../components"
 
 function Login() {
   const navigate = useNavigate()
@@ -22,7 +22,7 @@ function Login() {
   return (
     <div className="h-screen flex">
       <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
-        <Header headerText="Login" subHeader="Don't have an account yet?" routePath={ERouteNames.SIGNUP_PAGE} hyperlinkText="Signup here." />
+        <Header headerText="Login" subHeader="Don't have an account yet?" routePath={ERouteNames.SIGNUP_PAGE} hyperlinkText="Click here to signup." />
         <form onSubmit={handleSubmit}>
           <Input 
             hasLabel={true}
@@ -51,7 +51,7 @@ function Login() {
                 className="bg-sky-800 py-2 px-4 text-sm text-white w-full rounded border hover:bg-sky-900 focus:outline-none focus:border-sky-900"
                 type="submit"
               >
-                {submitted ? <Preloader /> : "Login"}
+                {submitted ? <LoadingIndicator /> : "Login"}
               </button>
             </div>
           </div>

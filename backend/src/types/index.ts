@@ -1,9 +1,4 @@
-export interface IUser {
-  name: string;
-  avatar?: string;
-  email: string;
-  password: string;
-  role?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import {IUser, IUserSession} from "./schema-types"
+import {ITokenBody} from "./token"
+
+export {IUser, IUserSession, ITokenBody}

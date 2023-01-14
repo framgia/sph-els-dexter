@@ -1,3 +1,3 @@
-import {ITokens} from "./user"
+import {ITokens, ISignUp} from "./user"
 
-export type {ITokens}
+export type {ITokens, ISignUp}

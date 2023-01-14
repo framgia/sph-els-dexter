@@ -1,3 +1,8 @@
 import {EHttpStatusCode} from "./status-codes"
+import {EEnvironment} from "./environment"
 
-export {EHttpStatusCode}
+enum EToken {
+  EXPIRY = "1hr"
+}
+
+export {EHttpStatusCode, EToken, EEnvironment}
