@@ -3,6 +3,7 @@ config()
 
 export const PORT: string | undefined = process.env.DEV_PORT
 export const SALTROUND: string | undefined = process.env.SALTROUND
+export const NODE_ENV: string | undefined = process.env.NODE_ENV
 
 /** JWT Secret */
 export const ACCESS_TOKEN_SECRET: string | undefined = process.env.ACCESS_TOKEN_SECRET
