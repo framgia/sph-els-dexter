@@ -6,10 +6,12 @@ import {Input, Header, LoadingIndicator} from "../../components"
 import {ISignUp} from "./../../types"
 import {signUp} from "./../../services"
 import {slices} from "./../../redux/slice-collection"
+import {useToast} from "./../../hooks" 
 
 function Signup() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const {showToast} = useToast()
 
   const [name, setName] = useState<string>("")
   const [email, setEmail] = useState<string>("")
@@ -31,19 +33,23 @@ function Signup() {
 
       interface ISignupResult {
         data: {
-          accessToken: string;
-          refreshToken: string;
-          expiresIn: string;
-        };
-        message: string;
+          data: {
+            accessToken: string;
+            refreshToken: string;
+            expiresIn: string;
+          };
+          message: string;
+        }
       }
 
       const {data}: ISignupResult = await signUp(payload)
       
       dispatch(slices.user.login({
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken
+        accessToken: data.data.accessToken,
+        refreshToken: data.data.refreshToken
       }))
+
+      showToast("success", data.message)
 
       navigate(ERouteNames.DASHBOARD_PAGE)
     } catch (err) {

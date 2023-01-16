@@ -1,1 +1,3 @@
-export const setSession: string = "Login"
+export enum ELoginActions {
+  Login = "LOGIN"
+}
