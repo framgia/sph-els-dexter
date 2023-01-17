@@ -1,6 +1,5 @@
 import React, {useState} from "react"
 import {useNavigate} from "react-router-dom"
-import {slices} from "../../redux/slice-collection"
 import {useDispatch} from "react-redux";
 import {ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
@@ -15,7 +14,6 @@ function Login() {
 
   const handleSubmit = () => {
     setSubmitted(true)
-    dispatch(slices.user.login({accessToken: "thisisatesttoken"}))
     navigate(ERouteNames.DASHBOARD_PAGE)
   }
 

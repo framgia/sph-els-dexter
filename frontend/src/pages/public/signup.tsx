@@ -1,17 +1,10 @@
 import React, {useState} from "react"
 import {useNavigate} from "react-router-dom"
-import {useDispatch} from "react-redux"
 import {ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
-import {ISignUp} from "./../../types"
-import {signUp} from "./../../services"
-import {slices} from "./../../redux/slice-collection"
-import {useToast} from "./../../hooks" 
 
 function Signup() {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const {showToast} = useToast()
 
   const [name, setName] = useState<string>("")
   const [email, setEmail] = useState<string>("")
@@ -20,41 +13,11 @@ function Signup() {
 
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitted(true)
 
-    if (password !== confirmPassword) {
-      return console.error("Password do not match.")
-    }
-
-    try {
-      const payload: ISignUp = {name, email, password, role: 0}
-
-      interface ISignupResult {
-        data: {
-          data: {
-            accessToken: string;
-            refreshToken: string;
-            expiresIn: string;
-          };
-          message: string;
-        }
-      }
-
-      const {data}: ISignupResult = await signUp(payload)
-      
-      dispatch(slices.user.login({
-        accessToken: data.data.accessToken,
-        refreshToken: data.data.refreshToken
-      }))
-
-      showToast("success", data.message)
-
-      navigate(ERouteNames.DASHBOARD_PAGE)
-    } catch (err) {
-      console.error(err)
-    }
+    navigate(ERouteNames.DASHBOARD_PAGE)
   }
 
   return (
