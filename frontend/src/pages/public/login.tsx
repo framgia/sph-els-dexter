@@ -1,12 +1,10 @@
 import React, {useState} from "react"
 import {useNavigate} from "react-router-dom"
-import {useDispatch} from "react-redux";
 import {ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 
 function Login() {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   const [email, setEmail] = useState<string>()
   const [password, setPassword] = useState<string>()
