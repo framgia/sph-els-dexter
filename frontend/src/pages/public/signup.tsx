@@ -10,14 +10,11 @@ function Signup() {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [confirmPassword, setConfirmPassword] = useState<string>("")
-
   const [submitted, setSubmitted] = useState<boolean>(false)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitted(true)
-
-    navigate(ERouteNames.DASHBOARD_PAGE)
   }
 
   return (
@@ -25,7 +22,7 @@ function Signup() {
       <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
         <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Click here to login." />
         <form onSubmit={(e) => handleSubmit(e)}>
-          <Input 
+          <Input
             hasLabel={true}
             label="Name"
             type="text"
@@ -35,7 +32,7 @@ function Signup() {
             onInput={e => setName(e.currentTarget.value)}
             required={true}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Email"
             type="email"
@@ -45,7 +42,7 @@ function Signup() {
             onInput={e => setEmail(e.currentTarget.value)}
             required={true}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Password"
             type="password"
@@ -55,7 +52,7 @@ function Signup() {
             onInput={e => setPassword(e.currentTarget.value)}
             required={true}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Confirm Password"
             type="password"
@@ -65,7 +62,6 @@ function Signup() {
             onInput={e => setConfirmPassword(e.currentTarget.value)}
             required={true}
           />
-
           <div className="flex justify-center items-center mt-3">
             <div className="flex flex-col w-full">
               <button

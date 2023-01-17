@@ -4,25 +4,23 @@ import {useDispatch} from "react-redux";
 import {ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 
-function Login() {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
+const Login = () => {
   const [email, setEmail] = useState<string>()
   const [password, setPassword] = useState<string>()
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setSubmitted(true)
-    navigate(ERouteNames.DASHBOARD_PAGE)
   }
 
   return (
     <div className="h-screen flex">
       <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
         <Header headerText="Login" subHeader="Don't have an account yet?" routePath={ERouteNames.SIGNUP_PAGE} hyperlinkText="Click here to signup." />
+        
         <form onSubmit={handleSubmit}>
-          <Input 
+          <Input
             hasLabel={true}
             label="Email"
             type="email"
@@ -32,7 +30,7 @@ function Login() {
             onInput={e => setEmail(e.currentTarget.value)}
             required={true}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Password"
             type="password"
@@ -42,7 +40,6 @@ function Login() {
             onInput={e => setPassword(e.currentTarget.value)}
             required={true}
           />
-
           <div className="flex justify-center items-center mt-3">
             <div className="flex flex-col w-full">
               <button
