@@ -1,3 +1,4 @@
 import {ITokens} from "./user"
+import {IApiResponse} from "./api-response"
 
-export type {ITokens}
+export type {ITokens, IApiResponse}
