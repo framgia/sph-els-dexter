@@ -19,8 +19,6 @@ const Signup = () => {
 
   const submit: SubmitHandler<ISignUpForm> = (data) => {
     setSubmitted(true)
-
-    navigate(ERouteNames.DASHBOARD_PAGE)
   }
 
   return (
@@ -37,7 +35,7 @@ const Signup = () => {
             register={register}
             rules={{required: true}}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Email"
             type="email"
@@ -46,7 +44,7 @@ const Signup = () => {
             register={register}
             rules={{required: true}}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Password"
             type="password"
@@ -55,7 +53,7 @@ const Signup = () => {
             register={register}
             rules={{required: true}}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Confirm Password"
             type="password"
@@ -64,7 +62,6 @@ const Signup = () => {
             register={register}
             rules={{required: true}}
           />
-
           <div className="flex justify-center items-center mt-3">
             <div className="flex flex-col w-full">
               <button

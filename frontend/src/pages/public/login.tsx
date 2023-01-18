@@ -18,7 +18,6 @@ const Login = () => {
 
   const submit: SubmitHandler<ILoginForm> = data => {
     setSubmitted(true)
-    navigate(ERouteNames.DASHBOARD_PAGE)
   }
 
   return (
@@ -35,7 +34,7 @@ const Login = () => {
             register={register}
             rules={{required: true}}
           />
-          <Input 
+          <Input
             hasLabel={true}
             label="Password"
             type="password"
@@ -44,7 +43,6 @@ const Login = () => {
             register={register}
             rules={{required: true}}
           />
-
           <div className="flex justify-center items-center mt-3">
             <div className="flex flex-col w-full">
               <button
