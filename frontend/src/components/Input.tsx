@@ -1,32 +1,28 @@
-import React, {FormEventHandler} from "react"
+import {UseFormRegister, RegisterOptions, FieldValues} from "react-hook-form"
 
-interface IInputProps {
+interface IInputProps<TFormFields extends FieldValues> {
   type: "text" | "email" | "password";
-  id?: string;
+  name: string;
   placeholder?: string;
-  value: any;
-  onInput: FormEventHandler<HTMLInputElement>;
-  required: boolean;
   hasLabel?: boolean;
   label?: string;
+  register: UseFormRegister<TFormFields>;
+  rules?: RegisterOptions
 }
 
-function Input({
-  type, id, placeholder,
-  value, onInput, required,
-  hasLabel, label
-}: IInputProps) {
+const Input = ({
+  type, name, placeholder,
+  hasLabel, label, register, rules
+}: IInputProps<any>) => {
+  
   return (
     <div>
       {hasLabel ? <label htmlFor={label?.toLowerCase()}>{label}</label> : undefined}
       <input
         type={type}
         className="w-full p-2 border rounded-md outline-none text-sm transition duration-150 ease-in-out mb-4"
-        id={id}
         placeholder={placeholder}
-        value={value}
-        onInput={onInput}
-        required={required}
+        {...register && register(name, rules)}
       />
     </div>
   ) 

@@ -1,16 +1,22 @@
 import React, {useState} from "react"
+import {useForm, SubmitHandler} from "react-hook-form"
 import {useNavigate} from "react-router-dom"
-import {useDispatch} from "react-redux";
 import {ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 
+interface ILoginForm {
+  email: string;
+  password: string;
+}
+
 const Login = () => {
-  const [email, setEmail] = useState<string>()
-  const [password, setPassword] = useState<string>()
+  const navigate = useNavigate()
+
+  const {register, handleSubmit,} = useForm<ILoginForm>()
+
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const submit: SubmitHandler<ILoginForm> = data => {
     setSubmitted(true)
   }
 
@@ -18,27 +24,24 @@ const Login = () => {
     <div className="h-screen flex">
       <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
         <Header headerText="Login" subHeader="Don't have an account yet?" routePath={ERouteNames.SIGNUP_PAGE} hyperlinkText="Click here to signup." />
-        
-        <form onSubmit={handleSubmit}>
-          <Input
+        <form onSubmit={handleSubmit(submit)}>
+          <Input 
             hasLabel={true}
             label="Email"
             type="email"
-            id="email"
+            name="email"
             placeholder="Your Email"
-            value={email}
-            onInput={e => setEmail(e.currentTarget.value)}
-            required={true}
+            register={register}
+            rules={{required: true}}
           />
           <Input
             hasLabel={true}
             label="Password"
             type="password"
-            id="password"
+            name="password"
             placeholder="Your Password"
-            value={password}
-            onInput={e => setPassword(e.currentTarget.value)}
-            required={true}
+            register={register}
+            rules={{required: true}}
           />
           <div className="flex justify-center items-center mt-3">
             <div className="flex flex-col w-full">
