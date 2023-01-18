@@ -14,7 +14,6 @@ export const hashPassword = (text: string): string | undefined => {
 
 export const generateToken = (body: ITokenBody, type: "access" | "refresh"): string | null => {
   if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) return null
-
   const secret: string = type === "access"
     ? ACCESS_TOKEN_SECRET
     : REFRESH_TOKEN_SECRET
