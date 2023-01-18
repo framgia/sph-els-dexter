@@ -1,5 +1,5 @@
 import {Request, Response} from "express"
-import {ErrorException, respondError, generateToken} from "./../../utils"
+import {ErrorException, respondError, generateToken, comparePassword} from "./../../utils"
 import {S3_DEFAULT_IMAGE} from "./../../configs"
 import {IUser, ITokenBody, IUserSession} from "./../../types"
 import {EHttpStatusCode, EToken} from "./../../enums"
@@ -48,6 +48,61 @@ export const UserController = {
           expiresIn: EToken.EXPIRY
         },
         message: "You are successfully registered."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
+  LOGIN: async (req: Request, res: Response) => {
+    try {
+      interface ICredentials {
+        email: string;
+        password: string;
+      }
+
+      const {email, password}: ICredentials = req.body
+
+      if (!email || !password) throw new ErrorException("Email and password is required.")
+
+      const userDetails: IUser | null = await User.findOne<IUser>({email}).exec()
+
+      if (!userDetails) throw new ErrorException("Invalid username or password.")
+
+      const isPasswordCorrect: boolean = comparePassword(userDetails.password, password)
+
+      if (!isPasswordCorrect) throw new ErrorException("Invalid username or password.")
+
+      const tokenBody: ITokenBody = {
+        userId: userDetails._id,
+        name: userDetails.name,
+        email,
+        role: userDetails.role ? "admin" : "student"
+      }
+
+      const accessToken: string | null = generateToken(tokenBody, "access")
+      const refreshToken: string | null = generateToken(tokenBody, "refresh")
+
+      const saveSession = await UserSession.findOneAndUpdate({userId: userDetails._id}, {
+        sessionToken: refreshToken, 
+        updatedAt: Date.now()
+      })
+
+      if (!saveSession) {
+        const newSession = new UserSession({
+          userId: userDetails._id,
+          sessionToken: refreshToken
+        })
+
+        await newSession.save()
+      }
+
+      res.status(EHttpStatusCode.OK).send({
+        data: {
+          accessToken,
+          refreshToken,
+          expiresIn: EToken.EXPIRY
+        },
+        message: "You are successfully logged in."
       })
     } catch (err) {
       respondError(err, res)
