@@ -18,7 +18,7 @@ const ActivityLogs = ({logs}: IActivityLogsProps) => {
 
       {/* Logs section */}
       <div className="py-4 w-full">
-        <ul className="max-w-md space-y-1 list-none list-inside">
+        <ul className="w-full max-w-md space-y-1 list-none list-inside">
           {
             logs.length ? logs.map(({avatar, activityParagraph, time}: ILog) => {
               return (
@@ -33,9 +33,11 @@ const ActivityLogs = ({logs}: IActivityLogsProps) => {
                 </li>
               )
             }) : (
-              <div className="flex items-center justify-center py-4">
-                <span className="font-semibold">No activity as of the moment.</span>
-              </div>
+              <li className="w-full">
+                <div className="flex items-center justify-center py-4">
+                  <span className="font-semibold">No activity as of the moment.</span>
+                </div>
+              </li>
             )
           }
         </ul>

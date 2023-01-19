@@ -15,6 +15,18 @@ const schema = new Schema<IUser>({
     type: Array,
     default: []
   },
+  followers: {
+    type: Array,
+    default: []
+  },
+  following: {
+    type: Array,
+    default: []
+  },
+  wordsLearned: {
+    type: Array,
+    default: []
+  },
   createdAt: {
     type: Number,
     default: Date.now()

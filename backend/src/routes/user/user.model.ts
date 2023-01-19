@@ -9,4 +9,6 @@ router.post("/login", UserController.LOGIN)
 
 router.post("/auditlog", UserController.AUDIT_LOG)
 
+router.post("/social", UserController.SOCIAL)
+
 export default router
