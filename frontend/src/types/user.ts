@@ -8,8 +8,4 @@ export interface ISignUp {
   email: string;
   password: string;
   role: number;
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

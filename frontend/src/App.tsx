@@ -4,11 +4,7 @@ import {CookiesProvider, Cookies} from "react-cookie"
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-<<<<<<< Updated upstream
 import {LoginPage, SignupPage, DashboardPage, ProfilePage} from "./pages"
-=======
-import {LoginPage, SignupPage, DashboardPage} from "./pages"
->>>>>>> Stashed changes
 import {ERouteNames} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
 import {RootState} from "./redux"
@@ -18,7 +14,6 @@ import {verifyToken} from "./utils"
 import { IUserDetails } from './redux/user/user-states';
 
 function App() {
-<<<<<<< Updated upstream
   const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.session.loggedIn)
   const cookies = new Cookies()
   const dispatch = useDispatch()
@@ -77,17 +72,6 @@ function App() {
                 </Routes>
               )
             }
-=======
-  return (
-    <>
-      <div className="min-h-full h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <BrowserRouter>
-            <Routes>
-              <Route path={ERouteNames.ROOT_PAGE} element={<LoginPage/>} />
-              <Route path={ERouteNames.SIGNUP_PAGE} element={<SignupPage/>} />
-            </Routes>
->>>>>>> Stashed changes
           </BrowserRouter>
         </div>
 

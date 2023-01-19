@@ -7,19 +7,12 @@ export const comparePassword = (hashed: string, plain: string): boolean => compa
 
 export const hashPassword = (text: string): string | undefined => {
   if (!SALTROUND) return undefined
-<<<<<<< Updated upstream
   
-=======
->>>>>>> Stashed changes
   return hashSync(text, parseInt(SALTROUND))
 }
 
 export const generateToken = (body: ITokenBody, type: "access" | "refresh"): string | null => {
   if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) return null
-<<<<<<< Updated upstream
-=======
-  
->>>>>>> Stashed changes
   const secret: string = type === "access"
     ? ACCESS_TOKEN_SECRET
     : REFRESH_TOKEN_SECRET

@@ -1,5 +1,4 @@
 import React, {useState} from "react"
-<<<<<<< Updated upstream
 import {useForm, SubmitHandler} from "react-hook-form"
 import {useNavigate} from "react-router-dom"
 import {useDispatch} from "react-redux"
@@ -67,39 +66,10 @@ const Signup = () => {
       <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
         <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Click here to login." />
         <form onSubmit={handleSubmit(submit)}>
-=======
-import {useNavigate} from "react-router-dom"
-import {ERouteNames} from "../../enums"
-import {Input, Header, LoadingIndicator} from "../../components"
-
-function Signup() {
-  const navigate = useNavigate()
-
-  const [name, setName] = useState<string>("")
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [confirmPassword, setConfirmPassword] = useState<string>("")
-
-  const [submitted, setSubmitted] = useState<boolean>(false)
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setSubmitted(true)
-
-    navigate(ERouteNames.DASHBOARD_PAGE)
-  }
-
-  return (
-    <div className="h-screen flex">
-      <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
-        <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Click here to login." />
-        <form onSubmit={(e) => handleSubmit(e)}>
->>>>>>> Stashed changes
           <Input 
             hasLabel={true}
             label="Name"
             type="text"
-<<<<<<< Updated upstream
             name="name"
             placeholder="Your Name"
             register={register}
@@ -132,45 +102,6 @@ function Signup() {
             register={register}
             rules={{required: true}}
           />
-=======
-            id="name"
-            placeholder="Your Name"
-            value={name}
-            onInput={e => setName(e.currentTarget.value)}
-            required={true}
-          />
-          <Input 
-            hasLabel={true}
-            label="Email"
-            type="email"
-            id="email"
-            placeholder="Your Email"
-            value={email}
-            onInput={e => setEmail(e.currentTarget.value)}
-            required={true}
-          />
-          <Input 
-            hasLabel={true}
-            label="Password"
-            type="password"
-            id="password"
-            placeholder="Your Password"
-            value={password}
-            onInput={e => setPassword(e.currentTarget.value)}
-            required={true}
-          />
-          <Input 
-            hasLabel={true}
-            label="Confirm Password"
-            type="password"
-            id="confirmpassword"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onInput={e => setConfirmPassword(e.currentTarget.value)}
-            required={true}
-          />
-
->>>>>>> Stashed changes
           <div className="flex justify-center items-center mt-3">
             <div className="flex flex-col w-full">
               <button

@@ -14,8 +14,4 @@ export const upload = multer({
       cb(null, `profile_${Date.now()}.jpeg`)
     }
   })
-<<<<<<< Updated upstream
 })
-=======
-})
->>>>>>> Stashed changes
