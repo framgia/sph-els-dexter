@@ -11,5 +11,6 @@ export const logger = (req: Request, res: Response, next: NextFunction) => {
     console.log("Request Payload: ", req.body)
     console.log("\n")
   }
+  
   next()
 }

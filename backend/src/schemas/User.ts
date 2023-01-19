@@ -30,4 +30,14 @@ schema.pre("save", function (next) {
   next()
 })
 
+schema.pre("save", function (next) {
+  const user = this
+
+  if (user.isModified('password')) {
+    user.password = hashPassword(user.password) as string
+  }
+
+  next()
+})
+
 export const User = model<IUser>('User', schema)
