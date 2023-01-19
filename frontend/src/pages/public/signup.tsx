@@ -1,12 +1,17 @@
 import React, {useState} from "react"
 import {useForm, SubmitHandler} from "react-hook-form"
 import {useNavigate} from "react-router-dom"
+import {useDispatch} from "react-redux"
 import {ERouteNames, EEndpoints} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 import {api} from "./../../configs"
 import {useToast} from "./../../hooks"
-import {IApiResponse, ITokens} from "./../../types"
+import {IApiResponse} from "./../../types"
+import {Cookies} from "react-cookie"
 import {AxiosResponse} from "axios"
+import {verifyToken} from "./../../utils"
+import {IUserDetails} from "../../redux/user/user-states"
+import {slices} from "./../../redux/slice-collection"
 
 interface ISignUpForm {
   name: string;
@@ -15,14 +20,12 @@ interface ISignUpForm {
   confirmPassword: string;
 }
 
-interface ITokenResponse extends ITokens {
-  expiresIn: string;
-}
-
 const Signup = () => {
   const navigate = useNavigate()
+  const cookies = new Cookies()
   const {register, handleSubmit} = useForm<ISignUpForm>()
   const {showToast} = useToast()
+  const dispatch = useDispatch()
 
   const [submitted, setSubmitted] = useState<boolean>(false)
 
@@ -30,8 +33,19 @@ const Signup = () => {
     setSubmitted(true)
 
     try {
-      const {data: {message}}: AxiosResponse<IApiResponse<ITokenResponse>> = await api.post(EEndpoints.REGISTER_USER, {...payload})
+      const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.REGISTER_USER, {...payload})
       
+      const token: string | null = cookies.get("refresh_token")
+
+      if (!token) return showToast("error", "Token not found.")
+
+      const userDetails: IUserDetails = verifyToken(token) as IUserDetails
+
+      if (!userDetails) return showToast("error", "Token is invalid.")
+
+      dispatch(slices.session.login())
+      dispatch(slices.datalog.logData(userDetails))
+
       showToast("success", message)
       navigate(ERouteNames.DASHBOARD_PAGE)
     } catch (err) {

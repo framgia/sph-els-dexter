@@ -18,16 +18,13 @@ interface ILoginForm {
   password: string;
 }
 
-interface ILoginResponse extends ITokens {
-  expiresIn: string;
-}
-
 const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const {showToast} = useToast()
 
   const cookies = new Cookies()
+
 
   const {register, handleSubmit,} = useForm<ILoginForm>()
 
