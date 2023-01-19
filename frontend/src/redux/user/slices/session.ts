@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
-import {ISession} from "./user-states"
-import {ELoginActions} from "./user-actions"
-import {ITokens} from "../../types"
+import {ISession} from "./../user-states"
+import {EUserActions} from "./../user-actions"
+import {ITokens} from "../../../types"
 
 const sessionInitialState: ISession = {
   loggedIn: false,
@@ -10,7 +10,7 @@ const sessionInitialState: ISession = {
 }
 
 export const userSessionSlice = createSlice({
-  name: ELoginActions.Login,
+  name: EUserActions.SESSION,
   initialState: sessionInitialState,
   reducers: {
     login: (state, action: PayloadAction<ITokens>) => {
@@ -35,5 +35,6 @@ export const userSessionSlice = createSlice({
   }
 })
 
-export const {login, logout} = userSessionSlice.actions
-export default userSessionSlice.reducer
+const {actions, reducer} = userSessionSlice
+export const {login, logout} = actions
+export default reducer

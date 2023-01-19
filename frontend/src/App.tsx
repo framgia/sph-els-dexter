@@ -10,7 +10,7 @@ import {RootState} from "./redux"
 import {ProtectedLayout} from "./pages/protected"
 
 function App() {
-  const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.user.loggedIn)
+  const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.session.loggedIn)
 
   return (
     <>

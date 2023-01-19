@@ -1,3 +1,4 @@
-export enum ELoginActions {
-  Login = "LOGIN"
+export enum EUserActions {
+  SESSION = "session",
+  LOGDATA = "logging of data"
 }
