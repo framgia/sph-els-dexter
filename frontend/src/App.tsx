@@ -3,19 +3,41 @@ import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import {LoginPage, SignupPage} from "./pages"
+import {LoginPage, SignupPage, DashboardPage, ProfilePage} from "./pages"
 import {ERouteNames} from "./enums"
+import {useSelector} from "react-redux"
+import {RootState} from "./redux"
+import {ProtectedLayout} from "./pages/protected"
 
 function App() {
+  const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.user.loggedIn)
+
   return (
     <>
-      <div className="min-h-full h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="w-screen min-h-full h-screen">
+        <div className="w-full w-full space-y-8">
           <BrowserRouter>
-            <Routes>
-              <Route path={ERouteNames.ROOT_PAGE} element={<LoginPage/>} />
-              <Route path={ERouteNames.SIGNUP_PAGE} element={<SignupPage/>} />
-            </Routes>
+            <ProtectedLayout>
+              <Routes>
+                <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
+                <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
+              </Routes>
+            </ProtectedLayout>
+            {/* {
+              isLoggedIn ? (
+                <Routes>
+                  <ProtectedLayout>
+                    <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
+                    <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
+                  </ProtectedLayout>
+                </Routes>
+              ) : (
+                <Routes>
+                  <Route path={ERouteNames.ROOT_PAGE} element={<LoginPage/>} />
+                  <Route path={ERouteNames.SIGNUP_PAGE} element={<SignupPage/>} />
+                </Routes>
+              )
+            } */}
           </BrowserRouter>
         </div>
 
