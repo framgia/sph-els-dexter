@@ -1,5 +1,7 @@
 import React, {ReactNode} from "react"
 import {Location, useLocation, Link} from "react-router-dom"
+import {useSelector} from "react-redux"
+import {RootState} from "./../../redux"
 import {ERouteNames} from "./../../enums"
 import {DEFAULT_AVATAR} from "./../../configs"
 
@@ -9,6 +11,8 @@ interface ILayoutProps {
 
 const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   const location: Location = useLocation()
+
+  const avatar: string = useSelector((state: RootState): string => state.userdata.avatar)
 
   const pathName: string = location.pathname
   const currentRoute: string | null = pathName === ERouteNames.DASHBOARD_PAGE

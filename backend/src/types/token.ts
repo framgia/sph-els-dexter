@@ -1,5 +1,5 @@
 export interface ITokenBody {
-  userId?: string;
+  avatar: string;
   name: string;
   email: string;
   role: "student" | "admin"

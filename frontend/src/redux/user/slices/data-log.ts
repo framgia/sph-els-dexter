@@ -19,10 +19,15 @@ export const userSessionSlice = createSlice({
         ...state,
         ...action.payload
       }
+    },
+    reset: (state) => {
+      state = dataInitialState
+
+      return state
     }
   }
 })
 
 const {actions, reducer} = userSessionSlice
-export const {logData} = actions
+export const {logData, reset} = actions
 export default reducer

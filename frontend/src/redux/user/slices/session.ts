@@ -13,11 +13,10 @@ export const userSessionSlice = createSlice({
   name: EUserActions.SESSION,
   initialState: sessionInitialState,
   reducers: {
-    login: (state, action: PayloadAction<ITokens>) => {
+    login: (state) => {
       state = {
         ...state,
-        loggedIn: true,
-        ...action.payload
+        loggedIn: true
       }
 
       return state
