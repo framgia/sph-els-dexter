@@ -24,6 +24,7 @@ const Login = () => {
   const {showToast} = useToast()
 
   const cookies = new Cookies()
+  
   const {register, handleSubmit,} = useForm<ILoginForm>()
 
   const [submitted, setSubmitted] = useState<boolean>(false)
@@ -46,7 +47,7 @@ const Login = () => {
         showToast("success", message)
         setSubmitted(false)
         
-        navigate(ERouteNames.DASHBOARD_PAGE)
+        return navigate(ERouteNames.DASHBOARD_PAGE)
       }
 
       showToast("error", "Unauthorized access.")
