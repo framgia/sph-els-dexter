@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
 import './App.css';
+import {CookiesProvider, Cookies} from "react-cookie"
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import {Cookies} from "react-cookie"
 import {LoginPage, SignupPage, DashboardPage, ProfilePage} from "./pages"
 import {ERouteNames} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
@@ -53,7 +53,7 @@ function App() {
   })
 
   return (
-    <>
+    <CookiesProvider>
       <div className="w-screen min-h-full h-screen">
         <div className="w-full w-full space-y-8">
           <BrowserRouter>
@@ -86,7 +86,7 @@ function App() {
         draggable
         pauseOnHover
       />
-    </>
+    </CookiesProvider>
   );
 }
 

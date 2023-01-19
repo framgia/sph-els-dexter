@@ -17,7 +17,7 @@ export const generateToken = (body: ITokenBody, type: "access" | "refresh"): str
     ? ACCESS_TOKEN_SECRET
     : REFRESH_TOKEN_SECRET
   const options: SignOptions | undefined = type === "access"
-    ? {expiresIn: "8hrs"}
+    ? {expiresIn: 8 * 60 * 60 * 1000}
     : undefined
 
   return sign(body, secret, options)

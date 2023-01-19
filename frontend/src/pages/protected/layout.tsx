@@ -3,7 +3,6 @@ import {Location, useLocation, Link} from "react-router-dom"
 import {useSelector} from "react-redux"
 import {RootState} from "./../../redux"
 import {ERouteNames} from "./../../enums"
-import {DEFAULT_AVATAR} from "./../../configs"
 
 interface ILayoutProps {
   children: ReactNode
@@ -13,6 +12,7 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   const location: Location = useLocation()
 
   const avatar: string = useSelector((state: RootState): string => state.userdata.avatar)
+  const isLoggedIn: boolean = useSelector((state: RootState) => state.session.loggedIn)
 
   const pathName: string = location.pathname
   const currentRoute: string | null = pathName === ERouteNames.DASHBOARD_PAGE
@@ -40,7 +40,7 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
             </li>
           </ul>
           <Link to={ERouteNames.PROFILE_PAGE} className="ml-4">
-            <img className="w-10 h-10 rounded-full" src={DEFAULT_AVATAR} alt="avatar" />
+            <img className="w-10 h-10 rounded-full" src={avatar} alt="avatar" />
           </Link>
         </div>
       </div>

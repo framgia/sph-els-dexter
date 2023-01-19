@@ -47,6 +47,10 @@ const Signup = () => {
       dispatch(slices.datalog.logData(userDetails))
 
       showToast("success", message)
+
+      setSubmitted(false)
+      dispatch(slices.session.login())
+
       navigate(ERouteNames.DASHBOARD_PAGE)
     } catch (err) {
       console.error(err)
