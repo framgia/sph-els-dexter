@@ -26,7 +26,7 @@ const Signup = () => {
 
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const submit: SubmitHandler<ISignUpForm> = async (payload) => {
+  const submit: SubmitHandler<ISignUpForm> = async (payload: ISignUpForm) => {
     setSubmitted(true)
 
     try {
