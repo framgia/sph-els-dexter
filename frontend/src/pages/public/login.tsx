@@ -24,8 +24,6 @@ const Login = () => {
   const {showToast} = useToast()
 
   const cookies = new Cookies()
-
-
   const {register, handleSubmit,} = useForm<ILoginForm>()
 
   const [submitted, setSubmitted] = useState<boolean>(false)

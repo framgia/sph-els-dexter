@@ -129,7 +129,7 @@ export const UserController = {
 
       res.cookie("access_token", accessToken, cookieOptions)
       res.cookie("refresh_token", refreshToken)
-      
+
       res.status(EHttpStatusCode.OK).send({
         message: "You are successfully registered."
       })
