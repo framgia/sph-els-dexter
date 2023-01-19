@@ -1,5 +1,5 @@
-import React, {ReactNode} from "react"
-import {Location, useLocation, Link} from "react-router-dom"
+import React, {ReactNode, useEffect} from "react"
+import {Location, useLocation, Link, useNavigate} from "react-router-dom"
 import {useSelector} from "react-redux"
 import {RootState} from "./../../redux"
 import {ERouteNames} from "./../../enums"
@@ -10,6 +10,7 @@ interface ILayoutProps {
 
 const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   const location: Location = useLocation()
+  const navigate = useNavigate()
 
   const avatar: string = useSelector((state: RootState): string => state.userdata.avatar)
   const isLoggedIn: boolean = useSelector((state: RootState) => state.session.loggedIn)
@@ -22,6 +23,14 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     : pathName === ERouteNames.QUIZ_PAGE
     ? "Quiz"
     : null
+
+  /**
+   * 
+   * binuang wala nigana, diko motoo aning styla ni
+   */
+  useEffect(() => {
+    if (!isLoggedIn) return navigate(ERouteNames.ROOT_PAGE)
+  }, [isLoggedIn])
 
   return (
     <div className="w-full flex flex-col">
