@@ -1,6 +1,6 @@
 import {CookieOptions, Request, Response} from "express"
 import {respondError, ErrorException, generateToken, comparePassword} from "./../../utils"
-import {IUser, ITokenBody, IUserSession} from "./../../types"
+import {IUser, ITokenBody, IUserSession, IAuditLogs, ITypedRequestBody} from "./../../types"
 import {User, UserSession} from "./../../schemas"
 import {EHttpStatusCode, EToken} from "./../../enums"
 import {S3_DEFAULT_IMAGE} from "./../../configs"
@@ -10,8 +10,38 @@ interface IUserCredentials {
   password: string;
 }
 
+interface IAuditLogQuery {
+  auditTrail: IAuditLogs[]
+}
+
 export const UserController = {
-  LOGIN: async (req: Request, res: Response) => {
+  AUDIT_LOG: async (req: Request, res: Response) => {
+    const {user_id} = req.params
+
+    try {
+      /** 
+       * 
+       * If user_id is missing from params,
+       * that means that the client is requesting for the
+       * list of audit logs from all users (for dashboard data),
+       * then we have to sort it using 
+       * the field `createdAt`
+       */
+      const auditLog: IAuditLogQuery | IAuditLogQuery[] | null = !user_id
+        ? await User.find<IAuditLogQuery>({}, "auditTrail name").exec()
+        : await User.findById<IAuditLogQuery>(user_id, "auditTrail name").exec()
+      
+      if (!auditLog) throw new ErrorException("User not found.")
+
+      res.status(EHttpStatusCode.OK).send({
+        data: auditLog,
+        message: "Audit logs successfully fetched."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
+  LOGIN: async (req: ITypedRequestBody<IUserCredentials>, res: Response) => {
     try {
       const {email, password}: IUserCredentials = req.body
 
@@ -57,7 +87,7 @@ export const UserController = {
       respondError(err, res)
     }
   },
-  CREATE_USER: async (req: Request, res: Response) => {
+  CREATE_USER: async (req: ITypedRequestBody<IUser>, res: Response) => {
     try {
       const avatar: string | undefined = S3_DEFAULT_IMAGE
 
