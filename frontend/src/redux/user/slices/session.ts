@@ -34,6 +34,5 @@ export const userSessionSlice = createSlice({
 })
 
 const {actions, reducer} = userSessionSlice
-
 export const {login, logout} = actions
 export default reducer

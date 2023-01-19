@@ -62,59 +62,57 @@ const Signup = () => {
   }
 
   return (
-    <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="h-screen flex">
-        <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
-          <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Click here to login." />
-          <form onSubmit={handleSubmit(submit)}>
-            <Input 
-              hasLabel={true}
-              label="Name"
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              register={register}
-              rules={{required: true}}
-            />
-            <Input
-              hasLabel={true}
-              label="Email"
-              type="email"
-              name="email"
-              placeholder="Your Email"
-              register={register}
-              rules={{required: true}}
-            />
-            <Input
-              hasLabel={true}
-              label="Password"
-              type="password"
-              name="password"
-              placeholder="Your Password"
-              register={register}
-              rules={{required: true}}
-            />
-            <Input
-              hasLabel={true}
-              label="Confirm Password"
-              type="password"
-              name="confirmpassword"
-              placeholder="Confirm Password"
-              register={register}
-              rules={{required: true}}
-            />
-            <div className="flex justify-center items-center mt-3">
-              <div className="flex flex-col w-full">
-                <button
-                  className="bg-sky-800 py-2 px-4 text-sm text-white w-full rounded border hover:bg-sky-900 focus:outline-none focus:border-sky-900"
-                  type="submit"
-                >
-                  {submitted ? <LoadingIndicator /> : "Sign Up"}
-                </button>
-              </div>
+    <div className="h-screen flex items-center justify-center">
+      <div className="w-full max-w-md m-auto bg-white rounded-lg border shadow-md py-10 px-16">
+        <Header headerText="Sign Up" subHeader="Already have an account?" routePath={ERouteNames.ROOT_PAGE} hyperlinkText="Click here to login." />
+        <form onSubmit={handleSubmit(submit)}>
+          <Input 
+            hasLabel={true}
+            label="Name"
+            type="text"
+            name="name"
+            placeholder="Your Name"
+            register={register}
+            rules={{required: true}}
+          />
+          <Input
+            hasLabel={true}
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="Your Email"
+            register={register}
+            rules={{required: true}}
+          />
+          <Input
+            hasLabel={true}
+            label="Password"
+            type="password"
+            name="password"
+            placeholder="Your Password"
+            register={register}
+            rules={{required: true}}
+          />
+          <Input
+            hasLabel={true}
+            label="Confirm Password"
+            type="password"
+            name="confirmpassword"
+            placeholder="Confirm Password"
+            register={register}
+            rules={{required: true}}
+          />
+          <div className="flex justify-center items-center mt-3">
+            <div className="flex flex-col w-full">
+              <button
+                className="bg-sky-800 py-2 px-4 text-sm text-white w-full rounded border hover:bg-sky-900 focus:outline-none focus:border-sky-900"
+                type="submit"
+              >
+                {submitted ? <LoadingIndicator /> : "Sign Up"}
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   )
