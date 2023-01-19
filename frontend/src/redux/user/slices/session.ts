@@ -12,7 +12,7 @@ export const userSessionSlice = createSlice({
   name: EUserActions.SESSION,
   initialState: sessionInitialState,
   reducers: {
-    login: (state) => {
+    login: state => {
       state = {
         ...state,
         loggedIn: true
