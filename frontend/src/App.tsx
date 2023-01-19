@@ -17,27 +17,21 @@ function App() {
       <div className="w-screen min-h-full h-screen">
         <div className="w-full w-full space-y-8">
           <BrowserRouter>
-            <ProtectedLayout>
-              <Routes>
-                <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
-                <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
-              </Routes>
-            </ProtectedLayout>
-            {/* {
+            {
               isLoggedIn ? (
-                <Routes>
-                  <ProtectedLayout>
+                <ProtectedLayout>
+                  <Routes>
                     <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
                     <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
-                  </ProtectedLayout>
-                </Routes>
+                  </Routes>
+                </ProtectedLayout>
               ) : (
                 <Routes>
                   <Route path={ERouteNames.ROOT_PAGE} element={<LoginPage/>} />
                   <Route path={ERouteNames.SIGNUP_PAGE} element={<SignupPage/>} />
                 </Routes>
               )
-            } */}
+            }
           </BrowserRouter>
         </div>
 
