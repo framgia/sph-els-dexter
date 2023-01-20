@@ -1,14 +1,14 @@
-import { AxiosResponse } from "axios"
-import { useState, useCallback, useEffect } from "react"
+import {AxiosResponse} from "axios"
+import {useState, useCallback, useEffect} from "react"
 import {useSelector} from "react-redux"
 import {Link} from "react-router-dom"
 import {useToast} from "./../../hooks"
 import {ActivityLogs} from "../../components"
-import { api } from "../../configs"
+import {api} from "../../configs"
 import {EEndpoints, ERouteNames} from "../../enums"
 import {RootState} from "../../redux"
 import {IUserDetails} from "../../redux/user/user-states"
-import { IApiResponse } from "../../types"
+import {IApiResponse} from "../../types"
 
 interface ISocialData {
   followers?: number;
@@ -16,10 +16,16 @@ interface ISocialData {
   wordsLearned?: number;
 }
 
-interface ISocialData {
-  followers?: number;
-  following?: number;
-  wordsLearned?: number;
+interface ILogs {
+  avatar: string;
+  action: string;
+  time: string;
+}
+
+interface IPersonalLogs {
+  auditTrail: ILogs[];
+  _id?: string;
+  name: string;
 }
 
 const ProfilePage = () => {
@@ -80,7 +86,7 @@ const ProfilePage = () => {
 
       {/* Right section for personal activity logs */}
       <div className="w-full p-8">
-        <ActivityLogs logs={testLogs} />
+        <ActivityLogs logs={logs} />
       </div>
     </div>
   )

@@ -1,11 +1,11 @@
 interface ILog {
   avatar: string;
-  activityParagraph: string;
+  action: string;
   time: string;
 }
 
 interface IActivityLogsProps {
-  logs: ILog[]
+  logs?: ILog[]
 }
 
 const ActivityLogs = ({logs}: IActivityLogsProps) => {
@@ -20,14 +20,14 @@ const ActivityLogs = ({logs}: IActivityLogsProps) => {
       <div className="py-4 w-full">
         <ul className="w-full max-w-md space-y-1 list-none list-inside">
           {
-            logs.length ? logs.map(({avatar, activityParagraph, time}: ILog) => {
+            logs && logs.length ? logs.map(({avatar, action, time}: ILog) => {
               return (
                 <li className="flex items-center py-2">
                   <div className="px-4 pr-6">
                     <img className="w-14 h-14 rounded-full" src={avatar} alt="avatar" />
                   </div>
                   <div className="tracking-tight leading-normal flex flex-col">
-                    <span className="p-0 font-medium">{activityParagraph}</span>
+                    <span className="p-0 font-medium">{action}</span>
                     <span className="text-gray-500 p-0 -mt-2 text-sm">{time}</span>
                   </div>
                 </li>
