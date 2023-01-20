@@ -58,6 +58,24 @@ const ProfilePage = () => {
       })
   }, [dataFetch])
 
+  const testLogs = [
+    {
+      avatar,
+      activityParagraph: "Finishing up a ask from asana.",
+      time: "2 hours"
+    },
+    {
+      avatar,
+      activityParagraph: "Finishing up a ask from asana.",
+      time: "2 hours"
+    },
+    {
+      avatar,
+      activityParagraph: "Finishing up a ask from asana.",
+      time: "2 hours"
+    }
+  ]
+
   return (
     <div className="flex px-6">
       {/* Left section for the personal profile */}
