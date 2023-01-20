@@ -1,23 +1,45 @@
 import React, {useState} from "react"
 import {useForm, SubmitHandler} from "react-hook-form"
 import {useNavigate} from "react-router-dom"
-import {ERouteNames} from "../../enums"
+import {EEndpoints, ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
+import {useToast} from "./../../hooks"
+import {api} from "./../../configs"
+import {IApiResponse, ITokens} from "./../../types"
+import {AxiosResponse} from "axios"
 
 interface ILoginForm {
   email: string;
   password: string;
 }
 
+interface ILoginResponse extends ITokens {
+  expiresIn: string;
+}
+
 const Login = () => {
   const navigate = useNavigate()
+  const {showToast} = useToast()
 
   const {register, handleSubmit,} = useForm<ILoginForm>()
 
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const submit: SubmitHandler<ILoginForm> = data => {
+  const submit: SubmitHandler<ILoginForm> = async (data: ILoginForm) => {
     setSubmitted(true)
+
+    try {
+      const {data: {message}}: AxiosResponse<IApiResponse<ILoginResponse>> = await api.post(EEndpoints.LOGIN, {...data})
+
+      showToast("success", message)
+      setSubmitted(false)
+      navigate(ERouteNames.DASHBOARD_PAGE)
+    } catch (err) {
+      const error: Error = err as Error
+      console.error(err)
+      setSubmitted(false)
+      showToast("error", error.message || "Something went wrong, please check the logs for more information about the error.")
+    }
   }
 
   return (
