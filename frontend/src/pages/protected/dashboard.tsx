@@ -1,6 +1,4 @@
-import React from "react"
-
-function Dashboard() {
+const Dashboard = () => {
   return (
     <div>This is the dashboard</div>
   )

@@ -1,25 +1,30 @@
 import React, {useState} from "react"
 import {useForm, SubmitHandler} from "react-hook-form"
 import {useNavigate} from "react-router-dom"
+import {useDispatch} from "react-redux"
 import {EEndpoints, ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 import {useToast} from "./../../hooks"
 import {api} from "./../../configs"
 import {IApiResponse, ITokens} from "./../../types"
 import {AxiosResponse} from "axios"
+import {verifyToken} from "./../../utils"
+import {Cookies} from "react-cookie"
+import {IUserDetails} from "../../redux/user/user-states"
+import {slices} from "./../../redux/slice-collection"
 
 interface ILoginForm {
   email: string;
   password: string;
 }
 
-interface ILoginResponse extends ITokens {
-  expiresIn: string;
-}
-
 const Login = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const {showToast} = useToast()
+
+  const cookies = new Cookies()
+
 
   const {register, handleSubmit,} = useForm<ILoginForm>()
 
@@ -29,11 +34,24 @@ const Login = () => {
     setSubmitted(true)
 
     try {
-      const {data: {message}}: AxiosResponse<IApiResponse<ILoginResponse>> = await api.post(EEndpoints.LOGIN, {...data})
+      const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.LOGIN, {...data})
+      
+      const token: string | undefined = cookies.get("refresh_token")
+      if (token) {
+        const userDetails: IUserDetails = verifyToken(token) as IUserDetails
 
-      showToast("success", message)
-      setSubmitted(false)
-      navigate(ERouteNames.DASHBOARD_PAGE)
+        if (!userDetails) return showToast("error", "Invalid token.")
+
+        dispatch(slices.session.login())
+        dispatch(slices.datalog.logData(userDetails))
+
+        showToast("success", message)
+        setSubmitted(false)
+        
+        navigate(ERouteNames.DASHBOARD_PAGE)
+      }
+
+      showToast("error", "Unauthorized access.")
     } catch (err) {
       const error: Error = err as Error
       console.error(err)

@@ -1,4 +1,4 @@
-import {Request, Response} from "express"
+import {CookieOptions, Request, Response} from "express"
 import {respondError, ErrorException, generateToken, comparePassword} from "./../../utils"
 import {IUser, ITokenBody, IUserSession} from "./../../types"
 import {User, UserSession} from "./../../schemas"
@@ -17,7 +17,7 @@ export const UserController = {
 
       if (!email || !password) throw new ErrorException("Email and password is required.")
 
-      const user: IUser = await User.findOne<IUser>({email}, "password name role").exec() as IUser
+      const user: IUser = await User.findOne<IUser>({email}, "password name role avatar").exec() as IUser
 
       if (!user || !user.password) throw new ErrorException("Invalid email or password.")
 
@@ -26,14 +26,14 @@ export const UserController = {
       if (!isPasswordCorrect) throw new ErrorException("Invalid email or password.")
 
       const tokenBody: ITokenBody = {
-        userId: user._id,
+        avatar: user.avatar || S3_DEFAULT_IMAGE || "",
         email,
         name: user.name,
         role: user.role ? "admin" : "student"
       }
 
-      const accessToken: string | null = generateToken(tokenBody, "access")
-      const refreshToken: string | null = generateToken(tokenBody, "refresh")
+      const accessToken: string | null = generateToken(tokenBody, "access") ?? ""
+      const refreshToken: string | null = generateToken(tokenBody, "refresh") ?? ""
 
       const updateSession = await UserSession.findOneAndUpdate({userId: user._id}, {
         sessionToken: refreshToken,
@@ -41,14 +41,17 @@ export const UserController = {
       })
 
       if (!updateSession) throw new ErrorException("Session data could not be updated.")
+
+      const cookieOptions: CookieOptions = {
+        expires: EToken.EXPIRY,
+        httpOnly: true
+      }
+
+      res.cookie("access_token", accessToken, cookieOptions)
+      res.cookie("refresh_token", refreshToken)
       
       res.status(EHttpStatusCode.OK).send({
-        message: "You are successfully logged in.",
-        data: {
-          accessToken,
-          refreshToken,
-          expiresIn: EToken.EXPIRY
-        }
+        message: "You are successfully logged in."
       })
     } catch (err) {
       respondError(err, res)
@@ -72,7 +75,9 @@ export const UserController = {
 
       const userId: string = userInstance.toObject()._id as unknown as string
       const tokenBody: ITokenBody = {
-        userId, name, email,
+        avatar: S3_DEFAULT_IMAGE || "", 
+        name, 
+        email,
         role: role === 0 ? "student" : "admin"
       }
 
@@ -89,13 +94,13 @@ export const UserController = {
         userInstance.save(),
         userSessionInstance.save()
       ])
+
+      const cookieOptions: CookieOptions = {expires: EToken.EXPIRY}
+
+      res.cookie("access_token", accessToken, cookieOptions)
+      res.cookie("refresh_token", refreshToken)
       
       res.status(EHttpStatusCode.OK).send({
-        data: {
-          accessToken,
-          refreshToken,
-          expiresIn: EToken.EXPIRY
-        },
         message: "You are successfully registered."
       })
     } catch (err) {

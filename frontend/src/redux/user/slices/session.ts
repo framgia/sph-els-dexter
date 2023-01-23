@@ -1,7 +1,6 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit"
+import {createSlice} from "@reduxjs/toolkit"
 import {ISession} from "./../user-states"
 import {EUserActions} from "./../user-actions"
-import {ITokens} from "../../../types"
 
 const sessionInitialState: ISession = {
   loggedIn: false,
@@ -13,11 +12,10 @@ export const userSessionSlice = createSlice({
   name: EUserActions.SESSION,
   initialState: sessionInitialState,
   reducers: {
-    login: (state, action: PayloadAction<ITokens>) => {
+    login: (state) => {
       state = {
         ...state,
-        loggedIn: true,
-        ...action.payload
+        loggedIn: true
       }
 
       return state
