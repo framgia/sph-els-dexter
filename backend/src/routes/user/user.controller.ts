@@ -1,4 +1,4 @@
-import {CookieOptions, Request, Response} from "express"
+import {CookieOptions, Response} from "express"
 import {respondError, ErrorException, generateToken, comparePassword} from "./../../utils"
 import {IUser, ITokenBody, IUserSession, IAuditLogs, ITypedRequestBody} from "./../../types"
 import {User, UserSession} from "./../../schemas"
@@ -14,9 +14,13 @@ interface IAuditLogQuery {
   auditTrail: IAuditLogs[]
 }
 
+interface IAuditTrailPayload {
+  email?: string;
+}
+
 export const UserController = {
-  AUDIT_LOG: async (req: Request, res: Response) => {
-    const {user_id} = req.params
+  AUDIT_LOG: async (req: ITypedRequestBody<IAuditTrailPayload>, res: Response) => {
+    const {email} = req.body
 
     try {
       /** 
@@ -27,9 +31,9 @@ export const UserController = {
        * then we have to sort it using 
        * the field `createdAt`
        */
-      const auditLog: IAuditLogQuery | IAuditLogQuery[] | null = !user_id
+      const auditLog: IAuditLogQuery | IAuditLogQuery[] | null = !email
         ? await User.find<IAuditLogQuery>({}, "auditTrail name").exec()
-        : await User.findById<IAuditLogQuery>(user_id, "auditTrail name").exec()
+        : await User.findOne<IAuditLogQuery>({email}, "auditTrail name").exec()
       
       if (!auditLog) throw new ErrorException("User not found.")
 
