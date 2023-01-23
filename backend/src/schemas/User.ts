@@ -11,6 +11,10 @@ const schema = new Schema<IUser>({
     type: Number,
     default: 0
   },
+  auditTrail: {
+    type: Array,
+    default: []
+  },
   createdAt: {
     type: Number,
     default: Date.now()
@@ -20,6 +24,7 @@ const schema = new Schema<IUser>({
     default: Date.now()
   }
 })
+
 schema.pre("save", function (next) {
   const user = this
 
@@ -27,16 +32,6 @@ schema.pre("save", function (next) {
     user.password = hashPassword(user.password) as string
   }
   
-  next()
-})
-
-schema.pre("save", function (next) {
-  const user = this
-
-  if (user.isModified('password')) {
-    user.password = hashPassword(user.password) as string
-  }
-
   next()
 })
 

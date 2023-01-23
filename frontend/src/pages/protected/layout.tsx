@@ -12,7 +12,6 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   const location: Location = useLocation()
 
   const avatar: string = useSelector((state: RootState): string => state.userdata.avatar)
-  const isLoggedIn: boolean = useSelector((state: RootState) => state.session.loggedIn)
 
   const pathName: string = location.pathname
   const currentRoute: string | null = pathName === ERouteNames.DASHBOARD_PAGE
@@ -26,7 +25,7 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   return (
     <div className="w-full flex flex-col">
       <div className="w-full py-4 px-6 bg-gray-100 flex justify-between items-center  ">
-        <label htmlFor="currentpage" className="font-semibold">{currentRoute}</label>
+        <label htmlFor="currentpage" className="font-semibold">E-Learning System | {currentRoute}</label>
         <div className="flex items-center">
           <ul className="text-base text-gray-700 pt-4 md:flex md:justify-between md:pt-0">
             <li>
