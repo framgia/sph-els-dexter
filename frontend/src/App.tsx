@@ -4,7 +4,10 @@ import {CookiesProvider, Cookies} from "react-cookie"
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import {LoginPage, SignupPage, DashboardPage, ProfilePage, WordPage} from "./pages"
+import {
+  LoginPage, SignupPage, DashboardPage, 
+  ProfilePage, WordPage, CategoryPage
+} from "./pages"
 import {ERouteNames} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
 import {RootState} from "./redux"
@@ -65,7 +68,8 @@ function App() {
                   <Routes>
                     <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
                     <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
-                    {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null }
+                    {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null}
+                    <Route path={ERouteNames.CATEGORY_PAGE} element={<CategoryPage/>} />
                   </Routes>
                 </ProtectedLayout>
               ) : (
