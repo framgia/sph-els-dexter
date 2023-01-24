@@ -45,4 +45,5 @@ export interface ICategory extends ITimestamp, IActors {
   title: string;
   description: string;
   status?: string;
+  words?: string[];
 }

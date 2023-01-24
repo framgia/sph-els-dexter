@@ -8,6 +8,10 @@ const schema = new Schema<ICategory>({
     type: String,
     default: "active"
   },
+  words: {
+    type: new Array<string>,
+    default: []
+  },
   createdAt: {
     type: Date,
     default: Date.now()
