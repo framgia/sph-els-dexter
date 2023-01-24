@@ -6,7 +6,7 @@ import {EEndpoints, ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 import {useToast} from "./../../hooks"
 import {api} from "./../../configs"
-import {IApiResponse, ITokens} from "./../../types"
+import {IApiResponse} from "./../../types"
 import {AxiosResponse} from "axios"
 import {verifyToken} from "./../../utils"
 import {Cookies} from "react-cookie"
@@ -49,7 +49,7 @@ const Login = () => {
         navigate(ERouteNames.DASHBOARD_PAGE)
       }
 
-      showToast("error", "Unauthorized access.")
+      return showToast("error", "Unauthorized access.")
     } catch (err) {
       const error: Error = err as Error
       console.error(err)

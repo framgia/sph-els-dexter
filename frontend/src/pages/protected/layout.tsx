@@ -20,6 +20,8 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Profile"
     : pathName === ERouteNames.QUIZ_PAGE
     ? "Quiz"
+    : pathName === ERouteNames.WORD_PAGE
+    ? "Word"
     : null
 
   return (
@@ -33,6 +35,9 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
             </li>
             <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Quiz</Link>
+            </li>
+            <li>
+              <Link to={ERouteNames.WORD_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Word</Link>
             </li>
             <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Settings</Link>
