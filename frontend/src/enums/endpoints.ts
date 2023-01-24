@@ -1,4 +1,5 @@
 export enum EEndpoints {
   REGISTER_USER = "/create",
-  LOGIN = "/login"
+  LOGIN = "/login",
+  ADD_WORD = "/quiz/word"
 }
