@@ -1,8 +1,8 @@
 import {Response} from "express"
 import {EHttpStatusCode} from "../../enums";
-import {ITypedRequestBody, IWordOptions} from "./../../types"
+import {ITypedRequestBody, IWordOptions, ICategory} from "./../../types"
 import {ErrorException, respondError} from "./../../utils"
-import {Word} from "./../../schemas"
+import {Word, Category} from "./../../schemas"
 
 interface IAddWordPayload {
   word: string;
@@ -10,6 +10,26 @@ interface IAddWordPayload {
 }
 
 export const QuizController = {
+  ADD_CATEGORY: async (req: ITypedRequestBody<ICategory>, res: Response) => {
+    try {
+      const {title, description}: ICategory = req.body
+
+      if (!title || !description) throw new ErrorException("Title and description is required.")
+
+      const categoryData = new Category({title, description})
+
+      const query = await categoryData.save()
+
+      if (!query) throw new ErrorException("Category is not saved, something went wrong.")
+
+      res.status(EHttpStatusCode.OK).send({
+        data: query,
+        message: "Category is successfully added."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
   ADD_WORD: async (req: ITypedRequestBody<IAddWordPayload>, res: Response) => {
     try {
       const {word, choices}: IAddWordPayload = req.body

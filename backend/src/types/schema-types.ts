@@ -47,7 +47,6 @@ export interface IWord extends ITimestamp, IActors {
   word: string;
   options: IWordOptions[];
 }
-<<<<<<< HEAD
 
 export interface ICategory extends ITimestamp, IActors {
   _id?: string;
@@ -56,5 +55,3 @@ export interface ICategory extends ITimestamp, IActors {
   status?: string;
   words?: string[];
 }
-=======
->>>>>>> f1ec3d8 (4.2 Admin add word API)
