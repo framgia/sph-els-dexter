@@ -46,10 +46,10 @@ const Login = () => {
         showToast("success", message)
         setSubmitted(false)
         
-        navigate(ERouteNames.DASHBOARD_PAGE)
+        return navigate(ERouteNames.DASHBOARD_PAGE)
       }
 
-      return showToast("error", "Unauthorized access.")
+      showToast("error", "Unauthorized access.")
     } catch (err) {
       const error: Error = err as Error
       console.error(err)

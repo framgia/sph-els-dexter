@@ -4,14 +4,17 @@ import {CookiesProvider, Cookies} from "react-cookie"
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import {LoginPage, SignupPage, DashboardPage, ProfilePage, WordPage} from "./pages"
+import {
+  LoginPage, SignupPage, DashboardPage, 
+  ProfilePage, WordPage, CategoryPage
+} from "./pages"
 import {ERouteNames} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
 import {RootState} from "./redux"
 import {slices} from "./redux/slice-collection"
 import {ProtectedLayout} from "./pages/protected"
 import {verifyToken} from "./utils"
-import { IUserDetails } from './redux/user/user-states';
+import {IUserDetails} from './redux/user/user-states';
 
 function App() {
   const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.session.loggedIn)
@@ -65,7 +68,8 @@ function App() {
                   <Routes>
                     <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
                     <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
-                    {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null }
+                    {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null}
+                    <Route path={ERouteNames.CATEGORY_PAGE} element={<CategoryPage/>} />
                   </Routes>
                 </ProtectedLayout>
               ) : (

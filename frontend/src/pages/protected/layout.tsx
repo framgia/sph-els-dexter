@@ -1,8 +1,13 @@
 import React, {ReactNode} from "react"
 import {Location, useLocation, Link} from "react-router-dom"
 import {useSelector} from "react-redux"
+import {Cookies} from "react-cookie"
+import Modal from "react-modal"
 import {RootState} from "./../../redux"
+import {slices} from "./../../redux/slice-collection"
 import {ERouteNames} from "./../../enums"
+
+Modal.setAppElement("#root")
 
 interface ILayoutProps {
   children: ReactNode
@@ -10,6 +15,7 @@ interface ILayoutProps {
 
 const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   const location: Location = useLocation()
+  const cookie = new Cookies()
 
   const avatar: string = useSelector((state: RootState): string => state.userdata.avatar)
   const role: "student" | "admin" = useSelector((state: RootState) => state.userdata.role)
@@ -23,7 +29,19 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Quiz"
     : pathName === ERouteNames.WORD_PAGE
     ? "Word"
+    : pathName === ERouteNames.CATEGORY_PAGE
+    ? "Category"
     : null
+
+    const signOut = () => {
+      /** Call logout API here */
+      cookie.remove("refresh_token")
+
+      slices.datalog.reset()
+      slices.session.logout()
+
+      window.location.href = "/"
+    }
 
   return (
     <div className="w-full flex flex-col">
@@ -45,7 +63,13 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
               ) : null
             }
             <li>
+              <Link to={ERouteNames.CATEGORY_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Category</Link>
+            </li>
+            <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Settings</Link>
+            </li>
+            <li>
+              <span className="py-2 block md:p-4 hover:text-purple-400 cursor-pointer" onClick={signOut}>Sign Out</span>
             </li>
           </ul>
           <Link to={ERouteNames.PROFILE_PAGE} className="ml-4">
