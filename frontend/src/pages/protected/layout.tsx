@@ -12,6 +12,7 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
   const location: Location = useLocation()
 
   const avatar: string = useSelector((state: RootState): string => state.userdata.avatar)
+  const role: "student" | "admin" = useSelector((state: RootState) => state.userdata.role)
 
   const pathName: string = location.pathname
   const currentRoute: string | null = pathName === ERouteNames.DASHBOARD_PAGE
@@ -36,9 +37,13 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
             <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Quiz</Link>
             </li>
-            <li>
-              <Link to={ERouteNames.WORD_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Word</Link>
-            </li>
+            {
+              role === "admin" ? (
+                <li>
+                  <Link to={ERouteNames.WORD_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Word</Link>
+                </li>
+              ) : null
+            }
             <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Settings</Link>
             </li>
