@@ -17,7 +17,7 @@ const Input = ({
   
   return (
     <div>
-      {hasLabel ? <label htmlFor={label?.toLowerCase()}>{label}</label> : undefined}
+      {hasLabel ? <label htmlFor={label?.toLowerCase()} className="text-sm">{label}</label> : undefined}
       <input
         type={type}
         className="w-full p-2 border rounded-md outline-none text-sm transition duration-150 ease-in-out mb-4"
