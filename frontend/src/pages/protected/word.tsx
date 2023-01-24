@@ -1,6 +1,7 @@
 import {useState} from "react"
 import {Input, LoadingIndicator} from "./../../components"
 import {SubmitHandler, useForm, useFieldArray} from "react-hook-form"
+import {api} from "./../../configs"
 
 interface IChoice {
   id: number;
@@ -33,8 +34,12 @@ const WordPage = () => {
     control
   })
 
-  const submit: SubmitHandler<IAddWordForm> = (data: IAddWordForm) => {
-    console.log(data)
+  const submit: SubmitHandler<IAddWordForm> = async (data: IAddWordForm) => {
+    try {
+      await api.post("/quiz/word", {...data})
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
