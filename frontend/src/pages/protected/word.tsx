@@ -3,12 +3,9 @@ import {AxiosResponse} from "axios"
 import {Input, LoadingIndicator} from "./../../components"
 import {SubmitHandler, useForm, useFieldArray} from "react-hook-form"
 import {api} from "./../../configs"
-<<<<<<< HEAD
 import {EEndpoints} from "./../../enums"
 import {IApiResponse} from "./../../types"
 import {useToast} from "./../../hooks"
-=======
->>>>>>> 3fad4f2 (4.2 Admin add word API (Also added middlewares))
 
 interface IChoice {
   id: number;
