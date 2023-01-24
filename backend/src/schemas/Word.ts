@@ -2,7 +2,6 @@ import {Schema, model} from "mongoose"
 import {IWord, IWordOptions} from "./../types"
 
 const schema = new Schema<IWord>({
-  _id: String,
   word: String,
   options: {
     type: new Array<IWordOptions>,
