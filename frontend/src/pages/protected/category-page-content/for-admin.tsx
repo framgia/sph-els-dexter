@@ -1,12 +1,18 @@
-import {useState} from "react"
+import {useState, useEffect, useCallback} from "react"
 import DataTable, {TableColumn} from "react-data-table-component"
 import Modal from "react-modal"
+import {AxiosResponse} from "axios"
 import {AddCategoryModalContent, AddWordToCategoryModal, EditCategoryModalContent} from "./../modals"
+import {useToast} from "./../../../hooks"
+import {api} from "./../../../configs"
+import {IApiResponse} from "./../../../types"
+import {EEndpoints} from "./../../../enums"
 
 interface ITableData {
-  id?: string;
+  _id?: string;
   title: string;
   description: string;
+  words?: string[];
 }
 
 interface IModalContent {
@@ -34,27 +40,98 @@ const modalStyle = {
   }
 }
 
-const data = [
-  {
-    id: "1",
-    title: "Title 1",
-    description: "Description 1"
-  },
-  {
-    id: "2",
-    title: "Title 2",
-    description: "Description 2"
-  },
-  {
-    id: "3",
-    title: "Title 3",
-    description: "Description 3"
-  }
-]
-
 const AdminCategoryPage = () => {
+  const {showToast} = useToast()
+
   const [processing, setProcessing] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [searchWord, setSearchWord] = useState<string>("")
+
+  const [data, setData] = useState<ITableData[]>([])
+  const [filteredData, setFilteredData] = useState<ITableData[]>([])
+
+  const updatedWords = (categoryId?: string, words?: string[]) => {
+    if (categoryId && words) {
+      setData([
+        ...data.map((item: ITableData) => {
+          if (item._id === categoryId) {
+            item.words = words
+          }
+
+          return item
+        })
+      ])
+      setFilteredData([
+        ...data.map((item: ITableData) => {
+          if (item._id === categoryId) {
+            item.words = words
+          }
+
+          return item
+        })
+      ])
+    }
+  }
+
+  const newWordAdded = (categoryId?: string, wordId?: string) => {
+    if (categoryId && wordId) {
+      setData([
+        ...data.map((item: ITableData) => {
+          if (item._id === categoryId) {
+            if (item.words) {
+              item.words = [...item.words, wordId]
+            } else {
+              item.words = [wordId]
+            }
+          }
+
+          const removeDuplicate = item.words ? [...new Set(item.words)] : []
+          item.words = removeDuplicate
+
+          return item
+        })
+      ])
+      setFilteredData([
+        ...data.map((item: ITableData) => {
+          if (item._id === categoryId) {
+            if (item.words) {
+              item.words = [...item.words, wordId]
+            } else {
+              item.words = [wordId]
+            }
+          }
+
+          const removeDuplicate = item.words ? [...new Set(item.words)] : []
+          item.words = removeDuplicate
+
+          return item
+        })
+      ])
+    }
+  }
+
+  const dataFetch = useCallback(async () => {
+    setProcessing(true)
+
+    try {
+      const {data: {data: responseData}}: AxiosResponse<IApiResponse<ITableData[]>> = await api.get(EEndpoints.CATEGORY_LIST)
+
+      setData(responseData)
+      setFilteredData(responseData)
+      setProcessing(false)
+    } catch (err) {
+      setProcessing(false)
+      throw err
+    }
+  }, [])
+
+  useEffect(() => {
+    dataFetch()
+      .catch((err: Error) => {
+        console.error(err)
+        showToast("error", "Unable to fetch list, please check the console for more details.")
+      })
+  }, [dataFetch])
 
   const modalContentDefault: IModalContent = {
     addCategoryComponent: {render: false},
@@ -63,7 +140,7 @@ const AdminCategoryPage = () => {
       props: {
         description: "",
         title: "",
-        id: ""
+        _id: ""
       }
     },
     editCategoryComponent: {
@@ -71,7 +148,7 @@ const AdminCategoryPage = () => {
       props: {
         description: "",
         title: "",
-        id: ""
+        _id: ""
       }
     }
   }
@@ -85,7 +162,7 @@ const AdminCategoryPage = () => {
     const defaultProp: ITableData = {
       description: "",
       title: "",
-      id: ""
+      _id: ""
     }
 
     const content: IModalContent = {
@@ -126,6 +203,25 @@ const AdminCategoryPage = () => {
     setIsOpen(true)
   }
 
+  const deleteCategory = async (data: ITableData) => {
+    const ask = window.confirm("Are you sure you want to delete this category?")
+
+    if (ask) {
+      try {
+        const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.delete(`${EEndpoints.DELETE_CATEGORY}/${data._id}`)
+      
+        showToast("success", message)
+        dataFetch()
+          .catch(err => {throw err})
+      } catch (err) {
+        const error: Error = err as Error
+
+        console.error(err)
+        showToast("error", error.message)
+      }
+    }
+  }
+
   const columns: TableColumn<ITableData>[] = [
     {
       name: "Title",
@@ -139,11 +235,11 @@ const AdminCategoryPage = () => {
       cell: row => {
         return (
           <div className="flex">
-            <span className="cursor-pointer underline" id={row.id} onClick={() => addWordToCategory(row)}>Add word</span>
+            <span className="cursor-pointer underline" id={row._id} onClick={() => addWordToCategory(row)}>Add word</span>
             &nbsp;|&nbsp;
-            <span className="cursor-pointer underline" id={row.id} onClick={() => editCategory(row)}>Edit</span>
+            <span className="cursor-pointer underline" id={row._id} onClick={() => editCategory(row)}>Edit</span>
             &nbsp;|&nbsp;
-            <span className="cursor-pointer underline" id={row.id}>Delete</span>
+            <span className="cursor-pointer underline" id={row._id} onClick={() => deleteCategory(row)}>Delete</span>
           </div>
         )
       },
@@ -151,12 +247,26 @@ const AdminCategoryPage = () => {
     }
   ]
 
+  useEffect(() => {
+    if (searchWord)  {
+      setFilteredData([...data].filter((item: ITableData) => item.title.toLowerCase().includes(searchWord.toLowerCase())))
+    } else {
+      setFilteredData(data)
+    }
+  }, [searchWord])
+
   return (
     <>
       <div className="w-full p-10 flex flex-col">
-        <div className="w-full flex justify-end mb-4">
+        <div className="w-full flex justify-between mb-4">
+          <input 
+            className="w-1/2 p-2 border rounded-md outline-none text-sm transition duration-150 ease-in-out mb-2 mt-2" 
+            type="text" 
+            placeholder="Search for a category.."
+            onInput={(e) => setSearchWord(e.currentTarget.value)} 
+          />
           <button
-            className="bg-blue-500 shadow-sm hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+            className="bg-blue-500 shadow-sm hover:bg-blue-700 text-white font-bold text-sm py-2 px-4 border border-blue-700 rounded"
             onClick={addCategory}
           >
             Add Category
@@ -164,7 +274,7 @@ const AdminCategoryPage = () => {
         </div>
         <DataTable 
           columns={columns}
-          data={data}
+          data={filteredData}
           progressPending={processing}
           customStyles={customStyles}
           fixedHeader
@@ -182,9 +292,9 @@ const AdminCategoryPage = () => {
           modalContent.addCategoryComponent.render
           ? <AddCategoryModalContent setIsOpen={setIsOpen} />
           : modalContent.addWordComponent.render
-          ? <AddWordToCategoryModal setIsOpen={setIsOpen} data={modalContent.addWordComponent.props} />
+          ? <AddWordToCategoryModal setIsOpen={setIsOpen} data={modalContent.addWordComponent.props} newWordAdded={newWordAdded} />
           : modalContent.editCategoryComponent.render
-          ? <EditCategoryModalContent setIsOpen={setIsOpen} data={modalContent.editCategoryComponent.props} />
+          ? <EditCategoryModalContent setIsOpen={setIsOpen} data={modalContent.editCategoryComponent.props} updatedWords={updatedWords} />
           : null
         }
       </Modal>

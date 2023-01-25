@@ -7,5 +7,5 @@ export interface IWordOptions {
 export interface IWord {
   _id?: string;
   word: string;
-  options: IWordOptions[];
+  options?: IWordOptions[];
 }
