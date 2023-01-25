@@ -1,4 +1,4 @@
-import {Response} from "express"
+import {Request, Response} from "express"
 import {EHttpStatusCode} from "../../enums";
 import {ITypedRequestBody, IWordOptions, ICategory} from "./../../types"
 import {ErrorException, respondError} from "./../../utils"
@@ -10,6 +10,18 @@ interface IAddWordPayload {
 }
 
 export const QuizController = {
+  WORD_LIST: async (req: Request, res: Response) => {
+    try {
+      const list = await Word.find({}, "word options").exec()
+
+      res.status(EHttpStatusCode.OK).send({
+        data: list,
+        message: "List is successfully fetched."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
   ADD_CATEGORY: async (req: ITypedRequestBody<ICategory>, res: Response) => {
     try {
       const {title, description}: ICategory = req.body

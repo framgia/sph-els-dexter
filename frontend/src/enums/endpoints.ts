@@ -4,5 +4,6 @@ export enum EEndpoints {
   ADD_WORD = "/quiz/word",
   ADD_CATEGORY = "/quiz/category",
   AUDIT_LOGS = "/auditlog",
-  SOCIAL = "/social"
+  SOCIAL = "/social",
+  WORD_LIST = "/quiz/words/list"
 }

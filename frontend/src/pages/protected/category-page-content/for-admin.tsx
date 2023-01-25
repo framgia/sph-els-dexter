@@ -9,11 +9,6 @@ interface ITableData {
   description: string;
 }
 
-interface IModalComponentProp {
-  setIsOpen: (state: boolean) => void;
-  data?: ITableData;
-}
-
 interface IModalContent {
   addCategoryComponent: {render: boolean};
   addWordComponent: {render: boolean; props: ITableData};
