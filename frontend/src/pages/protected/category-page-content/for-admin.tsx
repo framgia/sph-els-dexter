@@ -2,7 +2,12 @@ import {useState} from "react"
 import DataTable, {TableColumn} from "react-data-table-component"
 import Modal from "react-modal"
 import {useForm, SubmitHandler} from "react-hook-form"
+import {AxiosResponse} from "axios"
+import {IApiResponse} from "./../../../types"
+import {useToast} from "./../../../hooks"
 import {Input, LoadingIndicator} from "./../../../components"
+import {EEndpoints} from "./../../../enums"
+import {api} from "./../../../configs"
 
 interface ITableData {
   id?: string;
@@ -82,8 +87,13 @@ const AdminCategoryPage = () => {
   const [submitted, setSubmitted] = useState<boolean>(false)
   const [processing, setProcessing] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const {showToast} = useToast()
 
-  const {register, handleSubmit} = useForm<ICategoryPayload>()
+  const {
+    register: categoryFormRegister, 
+    handleSubmit: categoryFormHandleSubmit, 
+    reset: resetCategoryForm
+  } = useForm<ICategoryPayload>()
 
   const customStyles = {
     headCells: {
@@ -94,7 +104,23 @@ const AdminCategoryPage = () => {
   }
 
   const addCategory: SubmitHandler<ICategoryPayload> = async (data: ICategoryPayload) => {
-    console.log(data)
+    setSubmitted(true)
+
+    try {
+      const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.ADD_CATEGORY, {...data})
+    
+      setSubmitted(false)
+      setIsOpen(false)
+
+      resetCategoryForm()
+      showToast("success", message)
+    } catch (err) {
+      const error: Error = err as Error
+
+      console.error(err)
+      showToast("error", error.message ?? "Category not added, please check the logs for more details.")
+      setSubmitted(false)
+    }
   }
 
   return (
@@ -127,14 +153,14 @@ const AdminCategoryPage = () => {
         <div className="w-full flex justify-center pb-3 mb-3 border-b">
           <span className="font-bold uppercase">add category</span>
         </div>
-        <form onSubmit={handleSubmit(addCategory)}>
+        <form onSubmit={categoryFormHandleSubmit(addCategory)}>
           <Input 
             hasLabel={true}
             label="Title"
             type="text"
             name="title"
             placeholder="Title"
-            register={register}
+            register={categoryFormRegister}
             rules={{required: true}}
           />
           <Input
@@ -143,7 +169,7 @@ const AdminCategoryPage = () => {
             type="text"
             name="description"
             placeholder="Description"
-            register={register}
+            register={categoryFormRegister}
             rules={{required: true}}
           />
           <div className="flex justify-center items-center mt-3">
