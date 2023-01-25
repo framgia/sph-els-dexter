@@ -1,7 +1,13 @@
 import {hashSync, compareSync} from "bcrypt"
-import {SignOptions, sign} from "jsonwebtoken"
+import {SignOptions, sign, verify, JwtPayload} from "jsonwebtoken"
 import {SALTROUND, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} from "./../configs"
 import {ITokenBody} from "./../types"
+
+export const verifyAccessToken = (token: string): string | JwtPayload | undefined => {
+  if (!ACCESS_TOKEN_SECRET) return undefined
+
+  return verify(token, ACCESS_TOKEN_SECRET)
+}
 
 export const comparePassword = (hashed: string, plain: string): boolean => compareSync(plain, hashed)
 
