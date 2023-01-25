@@ -93,7 +93,7 @@ const AdminCategoryPage = () => {
     }
   }
 
-  const addCategory: SubmitHandler<ICategoryPayload> = (data: ICategoryPayload) => {
+  const addCategory: SubmitHandler<ICategoryPayload> = async (data: ICategoryPayload) => {
     console.log(data)
   }
 
