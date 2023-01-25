@@ -1,7 +1,11 @@
 import {useState} from "react"
+import {AxiosResponse} from "axios"
 import {Input, LoadingIndicator} from "./../../components"
 import {SubmitHandler, useForm, useFieldArray} from "react-hook-form"
 import {api} from "./../../configs"
+import {EEndpoints} from "./../../enums"
+import {IApiResponse} from "./../../types"
+import {useToast} from "./../../hooks"
 
 interface IChoice {
   id: number;
@@ -16,8 +20,9 @@ interface IAddWordForm {
 
 const WordPage = () => {
   const [submitted, setSubmitted] = useState<boolean>(false)
+  const {showToast} = useToast()
 
-  const {register, handleSubmit, control} = useForm<IAddWordForm>({
+  const {register, handleSubmit, reset, control} = useForm<IAddWordForm>({
     defaultValues: {
       choices: [
         {
@@ -35,10 +40,20 @@ const WordPage = () => {
   })
 
   const submit: SubmitHandler<IAddWordForm> = async (data: IAddWordForm) => {
+    setSubmitted(true)
+
     try {
-      await api.post("/quiz/word", {...data})
+      const {data: {message}}: AxiosResponse<IApiResponse<any>> = await api.post(EEndpoints.ADD_WORD, {...data})
+
+      showToast("success", message)
+      reset()
+      setSubmitted(false)
     } catch (err) {
       console.error(err)
+      
+      const error: Error = err as Error
+      showToast("error", error.message ?? "Word is not added, please check the logs for more information.")
+      setSubmitted(false)
     }
   }
 

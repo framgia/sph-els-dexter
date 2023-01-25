@@ -15,6 +15,8 @@ import {IUserDetails} from './redux/user/user-states';
 
 function App() {
   const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.session.loggedIn)
+  const role: "student" | "admin" = useSelector((state: RootState) => state.userdata.role)
+
   const cookies = new Cookies()
   const dispatch = useDispatch()
 
@@ -63,7 +65,7 @@ function App() {
                   <Routes>
                     <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
                     <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
-                    <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} />
+                    {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null }
                   </Routes>
                 </ProtectedLayout>
               ) : (
