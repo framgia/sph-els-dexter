@@ -2,16 +2,16 @@ import React, {useState} from "react"
 import {useForm, SubmitHandler} from "react-hook-form"
 import {useNavigate} from "react-router-dom"
 import {useDispatch} from "react-redux"
+import {Cookies} from "react-cookie"
 import {EEndpoints, ERouteNames} from "../../enums"
 import {Input, Header, LoadingIndicator} from "../../components"
 import {useToast} from "./../../hooks"
-import {api} from "./../../configs"
-import {IApiResponse} from "./../../types"
 import {AxiosResponse} from "axios"
-import {verifyToken} from "./../../utils"
-import {Cookies} from "react-cookie"
-import {IUserDetails} from "../../redux/user/user-states"
+import {IApiResponse} from "../../types"
+import {api} from "../../configs"
 import {slices} from "./../../redux/slice-collection"
+import {verifyToken} from "./../../utils"
+import {IUserDetails} from "./../../redux/user/user-states"
 
 interface ILoginForm {
   email: string;
@@ -24,6 +24,7 @@ const Login = () => {
   const {showToast} = useToast()
 
   const cookies = new Cookies()
+  
   const {register, handleSubmit,} = useForm<ILoginForm>()
 
   const [submitted, setSubmitted] = useState<boolean>(false)
@@ -49,7 +50,7 @@ const Login = () => {
         return navigate(ERouteNames.DASHBOARD_PAGE)
       }
 
-      showToast("error", "Unauthorized access.")
+      return showToast("error", "Unauthorized access.")
     } catch (err) {
       const error: Error = err as Error
       console.error(err)

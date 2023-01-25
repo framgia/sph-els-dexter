@@ -13,6 +13,11 @@ export interface IAuditLogs<T = any> extends ITimestamp {
   action?: string;
 }
 
+export interface IWordsLearned {
+  wordId: string;
+  learnedAt?: Date;
+}
+
 export interface IUser extends ITimestamp {
   _id?: string;
   name: string;
@@ -21,6 +26,9 @@ export interface IUser extends ITimestamp {
   password: string;
   role?: number;
   auditTrail?: IAuditLogs[]
+  followers?: string[];
+  following?: string[];
+  wordsLearned?: IWordsLearned[];
 }
 
 export interface IUserSession extends ITimestamp {

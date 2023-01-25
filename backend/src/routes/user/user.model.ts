@@ -7,6 +7,8 @@ router.post("/create", UserController.CREATE_USER)
 
 router.post("/login", UserController.LOGIN)
 
-router.get("/auditlog/:user_id?", UserController.AUDIT_LOG)
+router.post("/auditlog", UserController.AUDIT_LOG)
+
+router.post("/social", UserController.SOCIAL)
 
 export default router
