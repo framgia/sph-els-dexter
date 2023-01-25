@@ -1,6 +1,6 @@
 import {CookieOptions, Response} from "express"
 import {respondError, ErrorException, generateToken, comparePassword} from "./../../utils"
-import {IUser, ITokenBody, IUserSession, IAuditLogs, ITypedRequestBody} from "./../../types"
+import {IUser, ITokenBody, IUserSession, IAuditLogs, ITypedRequestBody, IWordsLearned} from "./../../types"
 import {User, UserSession} from "./../../schemas"
 import {EHttpStatusCode, EToken} from "./../../enums"
 import {S3_DEFAULT_IMAGE} from "./../../configs"
@@ -14,12 +14,40 @@ interface IAuditLogQuery {
   auditTrail: IAuditLogs[]
 }
 
-interface IAuditTrailPayload {
+interface IEmailPayload {
   email?: string;
 }
 
+interface ISocialQueryResponse {
+  followers?: string[];
+  following?: string[];
+  wordsLearned?: IWordsLearned[];
+}
+
 export const UserController = {
-  AUDIT_LOG: async (req: ITypedRequestBody<IAuditTrailPayload>, res: Response) => {
+  SOCIAL: async (req: ITypedRequestBody<IEmailPayload>, res: Response) => {
+    try {
+      const {email}: IEmailPayload = req.body
+
+      if (!email) throw new ErrorException("Email is missing from payload.")
+
+      const socialRecord: ISocialQueryResponse | null = await User.findOne({email}, "followers following wordsLearned")
+
+      if (!socialRecord) throw new ErrorException("User not found.")
+
+      res.status(EHttpStatusCode.OK).send({
+        data: {
+          followers: socialRecord && socialRecord.followers ? socialRecord.followers.length : 0,
+          following: socialRecord && socialRecord.following ? socialRecord.following.length : 0,
+          wordsLearned: socialRecord.wordsLearned ? socialRecord.wordsLearned.length : 0
+        },
+        message: "Social record is successfully fetched."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
+  AUDIT_LOG: async (req: ITypedRequestBody<IEmailPayload>, res: Response) => {
     const {email} = req.body
 
     try {

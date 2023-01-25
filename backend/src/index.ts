@@ -12,6 +12,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
 app.use(logger)
 app.use(upload.single("image"))
+
 router(app)
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}.`))

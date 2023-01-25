@@ -11,7 +11,7 @@ import {RootState} from "./redux"
 import {slices} from "./redux/slice-collection"
 import {ProtectedLayout} from "./pages/protected"
 import {verifyToken} from "./utils"
-import { IUserDetails } from './redux/user/user-states';
+import {IUserDetails} from './redux/user/user-states';
 
 function App() {
   const isLoggedIn: boolean = useSelector((state: RootState): boolean => state.session.loggedIn)
