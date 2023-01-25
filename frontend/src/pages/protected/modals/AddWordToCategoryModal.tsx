@@ -20,7 +20,7 @@ interface IModalData {
 }
 
 interface IModalData {
-  id?: string;
+  _id?: string;
   word: string;
 }
 
