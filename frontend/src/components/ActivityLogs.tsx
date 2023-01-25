@@ -20,9 +20,9 @@ const ActivityLogs = ({logs}: IActivityLogsProps) => {
       <div className="py-4 w-full">
         <ul className="w-full max-w-md space-y-1 list-none list-inside">
           {
-            logs && logs.length ? logs.map(({avatar, action, time}: ILog) => {
+            logs && logs.length ? logs.map(({avatar, action, time}: ILog, index: number) => {
               return (
-                <li className="flex items-center py-2">
+                <li className="flex items-center py-2" key={index}>
                   <div className="px-4 pr-6">
                     <img className="w-14 h-14 rounded-full" src={avatar} alt="avatar" />
                   </div>
