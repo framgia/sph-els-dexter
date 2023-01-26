@@ -73,6 +73,32 @@ export const UserController = {
       respondError(err, res)
     }
   },
+  LOGOUT: async (req: ITypedRequestBody<{email: string}>, res: Response) => {
+    try {
+      const {email} = req.body
+
+      if (!email) throw new ErrorException("Email is missing from payload.")
+
+      const user: {_id: string} | null = await User.findOne({email}, "_id").exec()
+
+      if (!user) throw new ErrorException("User not found.")
+
+      const {_id} = user
+
+      const removeAccess = await UserSession.findOneAndUpdate({userId: _id}, {sessionToken: null, updatedAt: Date.now()}).exec()
+
+      if (!removeAccess) throw new ErrorException("Unable to process logout, please try again later.")
+
+      res.clearCookie("access_token")
+      res.clearCookie("refresh_token")
+
+      res.status(EHttpStatusCode.OK).send({
+        message: "You are successfully logged out."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
   LOGIN: async (req: ITypedRequestBody<IUserCredentials>, res: Response) => {
     try {
       const {email, password}: IUserCredentials = req.body
@@ -123,14 +149,15 @@ export const UserController = {
     try {
       const avatar: string | undefined = S3_DEFAULT_IMAGE
 
-      const {name, email, password, role}: IUser = req.body
+      const {name, email, password}: IUser = req.body
+      const role = 0
 
       if (!name || !email || !password) throw new ErrorException("Name, email or password is missing from payload.")
 
       const data: IUser = {
         name, email, 
         password,
-        avatar, role
+        avatar
       }
 
       const userInstance = new User(data)
