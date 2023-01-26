@@ -2,10 +2,11 @@ import {useState, useCallback, useEffect} from "react"
 import {AxiosResponse} from "axios"
 import {IApiResponse, ICategory} from "./../../../types"
 import {api} from "./../../../configs"
-import {EEndpoints} from "./../../../enums"
+import {EEndpoints, ERouteNames} from "./../../../enums"
 import {useToast} from "../../../hooks"
+import {Link} from "react-router-dom"
 
-const CardComponent = ({title, description}: ICategory) => {
+const CardComponent = ({title, description, _id}: ICategory) => {
   return (
     <div className="flex justify-center">
       <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -14,12 +15,12 @@ const CardComponent = ({title, description}: ICategory) => {
         </a>
         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{description}</p>
         <div className="w-full flex justify-end">
-          <button
-            type="button" 
+          <Link
+            to={`${ERouteNames.QUIZ_PAGE}/${_id}/${title}`}
             className="inline-flex items-center px-6 py-2 text-sm font-medium text-center text-white bg-green-500 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
           >
             Start
-          </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,11 +1,11 @@
 import express, {Express} from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import {PORT} from "./configs"
+import {PORT, client} from "./configs"
 import {
-  router, upload, logger, 
+  router, upload, 
   setAuthorizationHeader,
-  authenticateToken
+  authenticateToken, logger
 } from "./middlewares"
 
 const app: Express = express()
@@ -21,4 +21,8 @@ app.use(logger)
 
 router(app)
 
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}.`))
+client.asPromise().then(() => {
+  console.log("Database connected")
+
+  app.listen(PORT, () => console.log(`Server is running on port ${PORT}.`))
+}).catch(err => console.error(err))
