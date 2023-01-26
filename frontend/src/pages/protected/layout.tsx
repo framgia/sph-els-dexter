@@ -32,7 +32,7 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Dashboard"
     : pathName === ERouteNames.PROFILE_PAGE
     ? "Profile"
-    : pathName === ERouteNames.QUIZ_PAGE
+    : pathName.includes(ERouteNames.QUIZ_PAGE)
     ? "Quiz"
     : pathName === ERouteNames.WORD_PAGE
     ? "Word"
@@ -79,9 +79,6 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
           <ul className="text-base text-gray-700 pt-4 md:flex md:justify-between md:pt-0">
             <li>
               <Link to={ERouteNames.DASHBOARD_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Dashboard</Link>
-            </li>
-            <li>
-              <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Quiz</Link>
             </li>
             {
               role === "admin" ? (

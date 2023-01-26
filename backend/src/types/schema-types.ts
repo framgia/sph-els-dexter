@@ -55,3 +55,18 @@ export interface ICategory extends ITimestamp, IActors {
   status?: string;
   words?: string[];
 }
+
+export interface IQuizProgress {
+  latestProgress: boolean;
+  unansweredWords: (string | undefined)[];
+  currentScore: number;
+  correctAnsweredWords: string[];
+  answeredAt: Date;
+}
+
+export interface IUserQuiz extends ITimestamp {
+  _id?: string;
+  userId: string;
+  categoryId: string;
+  progress?: IQuizProgress[];
+}

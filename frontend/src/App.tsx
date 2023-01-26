@@ -6,9 +6,10 @@ import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import {
   LoginPage, SignupPage, DashboardPage, 
-  ProfilePage, WordPage, CategoryPage
+  ProfilePage, WordPage, CategoryPage,
+  QuizPage
 } from "./pages"
-import {ERouteNames} from "./enums"
+import {ERouteNames, ERouteParams} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
 import {RootState} from "./redux"
 import {slices} from "./redux/slice-collection"
@@ -70,6 +71,7 @@ function App() {
                     <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
                     {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null}
                     <Route path={ERouteNames.CATEGORY_PAGE} element={<CategoryPage/>} />
+                    <Route path={`${ERouteNames.QUIZ_PAGE}/:${ERouteParams.CATEGORYID}/:${ERouteParams.CATEGORYNAME}`} element={<QuizPage />} />
                   </Routes>
                 </ProtectedLayout>
               ) : (
