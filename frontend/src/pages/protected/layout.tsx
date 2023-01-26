@@ -66,9 +66,6 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
               <Link to={ERouteNames.CATEGORY_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Category</Link>
             </li>
             <li>
-              <Link to={ERouteNames.WORD_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Word</Link>
-            </li>
-            <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Settings</Link>
             </li>
             <li>
