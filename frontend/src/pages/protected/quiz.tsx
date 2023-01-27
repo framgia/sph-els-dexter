@@ -2,7 +2,7 @@ import {useEffect, useCallback, useState} from "react"
 import {useSelector} from "react-redux"
 import {AxiosResponse} from "axios"
 import {useParams} from "react-router-dom"
-import {IApiResponse, IQuizProgress, IWord} from "./../../types"
+import {IApiResponse, IQuizProgress, IWord, IWordOptions} from "./../../types"
 import {api} from "./../../configs"
 import {RootState} from "./../../redux"
 import {EEndpoints} from "../../enums"
@@ -14,11 +14,37 @@ const QuizPage = () => {
 
   const email: string = useSelector((state: RootState): string => state.userdata.email)
 
-  const [progress, setProgress] = useState<IQuizProgress>()
   const [questions, setQuestions] = useState<IWord[]>([])
-  const [pendingQuestions, setPendingQuestions] = useState<IWord[]>([])
+  const [numberOfQuestions, setNumberOfQuestions] = useState<number>(0)
+  
+  const displayIndex: number = 0  /** To control the display */
+  let progress: IQuizProgress = {
+    answeredAt: new Date(),
+    correctAnsweredWords: [],
+    currentScore: 0,
+    latestProgress: true,
+    unansweredWords: []
+  }
 
   const optionListStyle: string = "mb-2 w-full px-4 py-2 border bg-blue-500 hover:bg-blue-800 text-white border-blue-500 rounded-lg dark:border-blue-600 cursor-pointer"
+
+  const selectAnswer = (question: IWord, optionSelected: IWordOptions) => {
+    const unAnsweredQuestions: IWord[] = questions.filter((item: IWord) => item._id !== question._id)
+
+    progress = {
+      answeredAt: new Date(),
+      correctAnsweredWords: optionSelected.correctChoice 
+        ? [...progress!.correctAnsweredWords, question._id] as string[]
+        : [...progress!.correctAnsweredWords],
+      currentScore: optionSelected.correctChoice
+        ? progress!.currentScore+1
+        : progress!.currentScore || 0,
+        unansweredWords: unAnsweredQuestions.map((item: IWord) => item._id) as string[],
+        latestProgress: true
+    }
+
+    setQuestions(unAnsweredQuestions)
+  }
 
   const dataFetch = useCallback(async () => {
     try {
@@ -30,8 +56,18 @@ const QuizPage = () => {
         email
       })
 
-      setProgress(data.progress)
-      setQuestions(data.words)
+      const answeredWords: string[] = data.progress.correctAnsweredWords
+      
+      progress = data.progress
+      setNumberOfQuestions(data.words.length)
+
+      if (answeredWords.length) {
+        setQuestions([
+          ...data.words.filter((item: IWord) => item && item._id ? !answeredWords.includes(item._id) : false)
+        ])
+      } else {
+        setQuestions(data.words)
+      }
     } catch (err) {
       throw err
     }
@@ -53,44 +89,38 @@ const QuizPage = () => {
             <span className="font-bold text-xl">{categoryName}</span>
           </div>
           <div className="w-1/2 flex justify-end">
-            <span className="font-bold text-xl">3 of 20</span>
+            <span className="font-bold text-xl">{(numberOfQuestions-questions.length)+1} of {numberOfQuestions}</span>
           </div>
         </div>
-        <div className="w-full flex">
-          <div className="w-1/2 flex justify-center pt-20">
-            <span className="font-semibold text-xl">Word</span>
-          </div>
-          <div className="w-1/2">
-            <div className="mt-6 flex flex-col w-full">
-              <span className={optionListStyle}>Option 1</span>
-              <span className={optionListStyle}>Option 2</span>
-              <span className={optionListStyle}>Option 3</span>
-              <span className={optionListStyle}>Option 4</span>
-            </div>
-          </div>
-        </div>
+        {
+          questions.length ? (
+            questions.map((item: IWord, index: number) => displayIndex === index ? (
+              <div className="w-full flex mt-4" key={item._id}>
+                <div className="w-1/2 flex justify-center items-center">
+                  <span className="font-semibold text-xl">{item.word}</span>
+                </div>
+                <div className="w-1/2">
+                  <div className="flex flex-col items-center w-full">
+                    {
+                      item.options?.length ? (
+                        item.options.map((option: IWordOptions) => (
+                          <span 
+                            className={optionListStyle} 
+                            key={option.id}
+                            onClick={() => selectAnswer(item, option)}
+                          >
+                            {option.choice}
+                          </span>
+                        ))
+                      ) : null
+                    }
+                  </div>
+                </div>
+              </div>
+            ) : null)
+          ) : null
+        }
       </div>
-      {/* <div className="flex justify-between">
-        <div className="w-1/2 flex flex-col">
-          <div className="w-full flex justify-center">
-            <span className="font-bold text-xl capitalize">{categoryName}</span>
-          </div>
-          <div className="w-full flex justify-center py-20">
-            <span className="font-semibold">Word</span>
-          </div>
-        </div>
-        <div className="w-1/2 flex flex-col">
-          <div className="w-full flex justify-end">
-            <span className="font-bold text-xl">3 of 20</span>
-          </div>
-          <div className="mt-6 flex flex-col w-full">
-            <span className={optionListStyle}>Option 1</span>
-            <span className={optionListStyle}>Option 2</span>
-            <span className={optionListStyle}>Option 3</span>
-            <span className={optionListStyle}>Option 4</span>
-          </div>
-        </div>
-      </div> */}
     </div>
   )
 }
