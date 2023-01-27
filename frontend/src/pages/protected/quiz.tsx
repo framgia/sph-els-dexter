@@ -1,19 +1,24 @@
 import {useEffect, useCallback, useState} from "react"
 import {useSelector} from "react-redux"
 import {AxiosResponse} from "axios"
-import {useParams} from "react-router-dom"
+import {useParams, useNavigate} from "react-router-dom"
 import {IApiResponse, IQuizProgress, IWord, IWordOptions} from "./../../types"
 import {api} from "./../../configs"
 import {RootState} from "./../../redux"
-import {EEndpoints} from "../../enums"
+import {EEndpoints, ERouteNames} from "../../enums"
 import {useToast} from "./../../hooks"
+import {LoadingIndicator} from "./../../components"
 
 const QuizPage = () => {
   const {categoryid: categoryId, categoryname: categoryName} = useParams()
+
+  const navigate = useNavigate()
   const {showToast} = useToast()
 
   const email: string = useSelector((state: RootState): string => state.userdata.email)
 
+  const [selectedOption, setSelectedOption] = useState<number | undefined>(undefined)
+  const [processing, setProcessing] = useState<boolean>(false)
   const [questions, setQuestions] = useState<IWord[]>([])
   const [numberOfQuestions, setNumberOfQuestions] = useState<number>(0)
   
@@ -26,24 +31,55 @@ const QuizPage = () => {
     unansweredWords: []
   }
 
-  const optionListStyle: string = "mb-2 w-full px-4 py-2 border bg-blue-500 hover:bg-blue-800 text-white border-blue-500 rounded-lg dark:border-blue-600 cursor-pointer"
+  const optionListStyle: string = `
+    mb-2 w-full px-4 py-2 
+    border text-white rounded-lg
+    cursor-pointer flex justify-between
+  `
 
-  const selectAnswer = (question: IWord, optionSelected: IWordOptions) => {
-    const unAnsweredQuestions: IWord[] = questions.filter((item: IWord) => item._id !== question._id)
+  const selectAnswer = async (question: IWord, optionSelected: IWordOptions) => {
+    try {
+      setSelectedOption(optionSelected.id)
+      setProcessing(true)
+      const unAnsweredQuestions: IWord[] = questions.filter((item: IWord) => item._id !== question._id)
 
-    progress = {
-      answeredAt: new Date(),
-      correctAnsweredWords: optionSelected.correctChoice 
-        ? [...progress!.correctAnsweredWords, question._id] as string[]
-        : [...progress!.correctAnsweredWords],
-      currentScore: optionSelected.correctChoice
-        ? progress!.currentScore+1
-        : progress!.currentScore || 0,
-        unansweredWords: unAnsweredQuestions.map((item: IWord) => item._id) as string[],
-        latestProgress: true
+      progress = {
+        answeredAt: new Date(),
+        correctAnsweredWords: optionSelected.correctChoice 
+          ? [...progress!.correctAnsweredWords, question._id] as string[]
+          : [...progress!.correctAnsweredWords],
+        currentScore: optionSelected.correctChoice
+          ? progress!.currentScore+1
+          : progress!.currentScore || 0,
+          unansweredWords: unAnsweredQuestions.map((item: IWord) => item._id) as string[],
+          latestProgress: true
+      }
+
+      const payload = {
+        categoryId,
+        email,
+        progress
+      }
+
+      const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.ANSWER_QUIZ, {...payload})
+
+      setSelectedOption(undefined)
+      setQuestions(unAnsweredQuestions)
+      setProcessing(false)
+
+      if (unAnsweredQuestions.length) {
+        showToast("success", message)
+      } else {
+        showToast("success", "All questions have been completely answered.")
+        /** Should navigate to the result page */
+        navigate(ERouteNames.CATEGORY_PAGE)
+      }
+    } catch (err) {
+      const error: Error = err as Error
+
+      console.error(err)
+      showToast("error", error.message ?? "Something went wrong during the request, please check the logs for more details.")
     }
-
-    setQuestions(unAnsweredQuestions)
   }
 
   const dataFetch = useCallback(async () => {
@@ -56,7 +92,9 @@ const QuizPage = () => {
         email
       })
 
-      const answeredWords: string[] = data.progress.correctAnsweredWords
+      const answeredWords: string[] = data.progress && data.progress.correctAnsweredWords
+        ? data.progress.correctAnsweredWords
+        : []
       
       progress = data.progress
       setNumberOfQuestions(data.words.length)
@@ -81,7 +119,7 @@ const QuizPage = () => {
       })
   }, [dataFetch])
 
-  return (
+  return questions.length ? (
     <div className="w-full px-96 py-20">
       <div className="flex flex-col">
         <div className="w-full flex">
@@ -105,11 +143,23 @@ const QuizPage = () => {
                       item.options?.length ? (
                         item.options.map((option: IWordOptions) => (
                           <span 
-                            className={optionListStyle} 
+                            className={
+                              processing
+                                ? selectedOption && selectedOption === option.id
+                                ? `bg-blue-800 border-blue-800 dark:border-blue-800 ${optionListStyle}`
+                                : `bg-blue-500 border-blue-500 dark:border-blue-600 ${optionListStyle}`
+                                : `bg-blue-500 border-blue-500 dark:border-blue-600 hover:bg-blue-800 ${optionListStyle}`
+                            } 
                             key={option.id}
-                            onClick={() => selectAnswer(item, option)}
+                            onClick={() => processing ? null : selectAnswer(item, option)}
                           >
-                            {option.choice}
+                            {option.choice} {
+                              processing 
+                                ? selectedOption && selectedOption === option.id
+                                ? <LoadingIndicator />
+                                : null 
+                                : null
+                              }
                           </span>
                         ))
                       ) : null
@@ -122,7 +172,7 @@ const QuizPage = () => {
         }
       </div>
     </div>
-  )
+  ) : null
 }
 
 export default QuizPage

@@ -1,6 +1,6 @@
 import {Request, Response} from "express"
 import {EHttpStatusCode} from "../../enums";
-import {ITypedRequestBody, IWordOptions, ICategory, IUserQuiz, IQuizProgress, IWord} from "./../../types"
+import {ITypedRequestBody, IWordOptions, ICategory, IUserQuiz, IQuizProgress, IWord, IUser} from "./../../types"
 import {ErrorException, respondError} from "./../../utils"
 import {Word, Category, UserQuiz, User} from "./../../schemas"
 
@@ -21,7 +21,57 @@ interface IUpdateCategoryPayload {
   description: string;
 }
 
+interface IAnswerQuizPayload {
+  categoryId: string;
+  email: string;
+  progress: IQuizProgress
+}
+
 export const QuizController = {
+  ANSWER_QUIZ: async (req: ITypedRequestBody<IAnswerQuizPayload>, res: Response) => {
+    try {
+      const {categoryId, email, progress}: IAnswerQuizPayload = req.body
+
+      if (!categoryId || !email || !progress) throw new ErrorException("categoryId, email and progress are required from payload.")
+
+      const userData: IUser | null = await User.findOne<IUser>({email}, "_id").exec()
+
+      if (!userData) throw new ErrorException("This user does not exist.")
+
+      const {_id: userId} = userData
+
+      /** This is assured that there is always a progress recorded for each user. */
+      const lastProgress: IUserQuiz = await UserQuiz.findOne<IUserQuiz>({categoryId, userId}) as IUserQuiz
+
+      const oldProgress: IQuizProgress[] | undefined = lastProgress.progress
+
+      const invalidateOldProgress: IQuizProgress[] = oldProgress
+        ? [...oldProgress.map((item: IQuizProgress) => {
+          item.latestProgress = false
+  
+          return item
+        })]
+        : []
+
+      await UserQuiz.findByIdAndUpdate<IUserQuiz>(lastProgress._id, {
+        $set: {
+          progress: invalidateOldProgress,
+          updatedAt: new Date()
+        }
+      })
+
+      await UserQuiz.findByIdAndUpdate<IUserQuiz>(lastProgress._id, {
+        $push: {progress}
+      })
+
+      res.status(EHttpStatusCode.OK).send({
+        message: "Your progress has been updated."
+      })
+    } catch (err) {
+      console.log(err)
+      respondError(err, res)
+    }
+  },
   START_QUIZ: async (req: ITypedRequestBody<{categoryId: string; email: string}>, res: Response) => {
     try {
       const {categoryId, email} = req.body
@@ -131,7 +181,7 @@ export const QuizController = {
         ]) : null
 
         const unansweredWords: (string | undefined)[] = words && words.length
-          ? [...words].map((item: IWord) => item._id)
+          ? [...words].map((item: IWord) => item._id?.toString())
           : []
 
         const quizProgress: IQuizProgress = {
@@ -145,14 +195,18 @@ export const QuizController = {
         const newQuiz = new UserQuiz({
           categoryId,
           userId,
-          progress: [quizProgress]
+          progress: quizProgress
         })
   
-        await newQuiz.save()
+        const hasBeenRecorded = await UserQuiz.findOne({categoryId, userId})
+
+        if (!hasBeenRecorded) {
+          await newQuiz.save()
+        }
   
         return res.status(EHttpStatusCode.OK).send({
           data: {
-            progress: [],
+            progress: undefined,
             words
           },
           message: "Quiz started."
@@ -161,7 +215,7 @@ export const QuizController = {
 
       res.status(EHttpStatusCode.OK).send({
         data: {
-          progress: [],
+          progress: undefined,
           words: []
         },
         message: "No words for this category."

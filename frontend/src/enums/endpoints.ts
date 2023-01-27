@@ -15,5 +15,6 @@ export enum EEndpoints {
   GET_WORD_DATA = "/quiz/words/data",
   UPDATE_CATEGORY = "/quiz/category/edit",
   DELETE_CATEGORY = "/quiz/category/delete",
-  START_QUIZ = "/quiz/start"
+  START_QUIZ = "/quiz/start",
+  ANSWER_QUIZ = "/quiz/answer"
 }
