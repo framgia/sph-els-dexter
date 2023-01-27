@@ -15,6 +15,8 @@ import {verifyToken} from "../../utils"
 
 Modal.setAppElement("#root")
 
+Modal.setAppElement("#root")
+
 interface ILayoutProps {
   children: ReactNode
 }
