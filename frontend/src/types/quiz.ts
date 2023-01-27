@@ -3,6 +3,7 @@ export interface IQuizProgress {
   unansweredWords: string[];
   currentScore: number;
   correctAnsweredWords: string[];
+  incorrectAnsweredWords: string[];
   answeredAt: Date;
 }
 

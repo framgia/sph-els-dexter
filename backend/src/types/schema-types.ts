@@ -58,9 +58,10 @@ export interface ICategory extends ITimestamp, IActors {
 
 export interface IQuizProgress {
   latestProgress: boolean;
-  unansweredWords: (string | undefined)[];
+  unansweredWords: string[];
   currentScore: number;
   correctAnsweredWords: string[];
+  incorrectAnsweredWords: string[];
   answeredAt: Date;
 }
 

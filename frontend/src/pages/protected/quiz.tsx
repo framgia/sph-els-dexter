@@ -21,15 +21,16 @@ const QuizPage = () => {
   const [processing, setProcessing] = useState<boolean>(false)
   const [questions, setQuestions] = useState<IWord[]>([])
   const [numberOfQuestions, setNumberOfQuestions] = useState<number>(0)
-  
-  const displayIndex: number = 0  /** To control the display */
-  let progress: IQuizProgress = {
+  const [progress, setProgress] = useState<IQuizProgress>({
     answeredAt: new Date(),
     correctAnsweredWords: [],
+    incorrectAnsweredWords: [],
     currentScore: 0,
     latestProgress: true,
     unansweredWords: []
-  }
+  })
+  
+  const displayIndex: number = 0  /** To control the display */
 
   const optionListStyle: string = `
     mb-2 w-full px-4 py-2 
@@ -41,13 +42,17 @@ const QuizPage = () => {
     try {
       setSelectedOption(optionSelected.id)
       setProcessing(true)
-      const unAnsweredQuestions: IWord[] = questions.filter((item: IWord) => item._id !== question._id)
 
-      progress = {
+      const unAnsweredQuestions: IWord[] = questions.filter((item: IWord) => item._id !== question._id)
+      console.log("progress", progress)
+      const progressData: IQuizProgress = {
         answeredAt: new Date(),
         correctAnsweredWords: optionSelected.correctChoice 
           ? [...progress!.correctAnsweredWords, question._id] as string[]
           : [...progress!.correctAnsweredWords],
+        incorrectAnsweredWords: optionSelected.correctChoice
+          ? [...progress!.incorrectAnsweredWords]
+          : [...progress!.incorrectAnsweredWords, question._id] as string[],
         currentScore: optionSelected.correctChoice
           ? progress!.currentScore+1
           : progress!.currentScore || 0,
@@ -55,10 +60,14 @@ const QuizPage = () => {
           latestProgress: true
       }
 
+      setProgress(progressData)
+
+      console.log(progressData, optionSelected.correctChoice, question._id)
+
       const payload = {
         categoryId,
         email,
-        progress
+        progress: progressData
       }
 
       const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.ANSWER_QUIZ, {...payload})
@@ -96,7 +105,7 @@ const QuizPage = () => {
         ? data.progress.correctAnsweredWords
         : []
       
-      progress = data.progress
+      setProgress(data.progress)
       setNumberOfQuestions(data.words.length)
 
       if (answeredWords.length) {
@@ -110,6 +119,10 @@ const QuizPage = () => {
       throw err
     }
   }, [])
+
+  useEffect(() => {
+    console.log("Progress is updated.", progress)
+  }, [progress])
 
   useEffect(() => {
     dataFetch()

@@ -94,13 +94,21 @@ export const QuizController = {
           ? foundProgress ?? undefined
           : undefined
 
-        const unansweredWords: (string| undefined)[] = progress 
+        const previousProgress: IQuizProgress | undefined = currentProgress.progress 
+          ? currentProgress.progress[currentProgress.progress.length-1]
+          : undefined
+
+        const wordsTouched: string[] = previousProgress
+          ? [...previousProgress.correctAnsweredWords, ...previousProgress.incorrectAnsweredWords]
+          : []
+
+        const unansweredWords: string[] = progress 
           ? progress.unansweredWords.length
           ? progress.unansweredWords.map((item: string | undefined) => item!.toString())
           : []
           : []
         
-        let finalUnansweredWords: (string | undefined)[] = unansweredWords
+        let finalUnansweredWords: string[] = unansweredWords
         const unansweredWordsCount: number = finalUnansweredWords.length
 
         /**
@@ -112,14 +120,22 @@ export const QuizController = {
         const wordData: {words: string[]} | null = await Category.findById<{words: string[]}>(categoryId, "words").exec()
 
         if (wordData) {
+          wordsTouched.forEach((item: string) => {
+            if (wordData && wordData.words) {
+              if (wordData.words.find((x: string) => x === item)) {
+                wordData.words.splice(wordData.words.findIndex((x: string) => x === item), 1)
+              }
+            }
+          })
+
           /** There are words set for this category, compare with the saved unanswered word */
-          if (wordData.words.length >= finalUnansweredWords.length) { /** <-- This means that a new word is added to this category */
+          if (wordData.words.length > finalUnansweredWords.length) { /** <-- This means that a new word is added to this category */
             wordData.words.forEach((item: string) => {
               if (!finalUnansweredWords.includes(item)) {
                 finalUnansweredWords = [...finalUnansweredWords, item]
               }
             })
-          } else {  /** <-- This means that a new word is removed from this category */
+          } else if (wordData.words.length < finalUnansweredWords.length) {  /** <-- This means that a new word is removed from this category */
             unansweredWords.forEach((item: string | undefined) => {
               if (!wordData.words.includes(item!)) {
                 finalUnansweredWords.splice(finalUnansweredWords.findIndex((x: string | undefined) => x! === item), 1)
@@ -177,18 +193,21 @@ export const QuizController = {
         const words: IWord[] | null = categoryWords.words ? await Promise.all([
           ...categoryWords.words.map((item: string) => {
             return Word.findById(item).exec()
-          }) as unknown as IWord[] || null
+          }) as unknown as IWord[]
         ]) : null
 
-        const unansweredWords: (string | undefined)[] = words && words.length
-          ? [...words].map((item: IWord) => item._id?.toString())
+        const unansweredWords: string[] = words
+          ? words.length
+          ? [...words].filter((item: IWord) => item._id).map((item: IWord) => item._id && item._id.toString()) as string[]
+          : []
           : []
 
         const quizProgress: IQuizProgress = {
           latestProgress: true,
-          unansweredWords: unansweredWords,
+          unansweredWords,
           currentScore: 0,
           correctAnsweredWords: [],
+          incorrectAnsweredWords: [],
           answeredAt: new Date()
         }
 
