@@ -44,7 +44,7 @@ const QuizPage = () => {
       setProcessing(true)
 
       const unAnsweredQuestions: IWord[] = questions.filter((item: IWord) => item._id !== question._id)
-      console.log("progress", progress)
+      
       const progressData: IQuizProgress = {
         answeredAt: new Date(),
         correctAnsweredWords: optionSelected.correctChoice 
@@ -62,16 +62,18 @@ const QuizPage = () => {
 
       setProgress(progressData)
 
-      console.log(progressData, optionSelected.correctChoice, question._id)
-
       const payload = {
         categoryId,
         email,
         progress: progressData
       }
 
-      const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.ANSWER_QUIZ, {...payload})
-
+      const {data: {data: responseData, message}}: AxiosResponse<IApiResponse<{
+        progress: IQuizProgress;
+        totalQuestions: number;
+        words: IWord[];
+      }>> = await api.post(EEndpoints.ANSWER_QUIZ, {...payload})
+      
       setSelectedOption(undefined)
       setQuestions(unAnsweredQuestions)
       setProcessing(false)
@@ -95,7 +97,8 @@ const QuizPage = () => {
     try {
       const {data: {data}}: AxiosResponse<IApiResponse<{
         progress: IQuizProgress;
-        words: IWord[]
+        totalQuestions: number;
+        words: IWord[];
       }>> = await api.post(EEndpoints.START_QUIZ, {
         categoryId,
         email
@@ -106,7 +109,7 @@ const QuizPage = () => {
         : []
       
       setProgress(data.progress)
-      setNumberOfQuestions(data.words.length)
+      setNumberOfQuestions(data.totalQuestions)
 
       if (answeredWords.length) {
         setQuestions([
@@ -119,10 +122,6 @@ const QuizPage = () => {
       throw err
     }
   }, [])
-
-  useEffect(() => {
-    console.log("Progress is updated.", progress)
-  }, [progress])
 
   useEffect(() => {
     dataFetch()
@@ -140,7 +139,9 @@ const QuizPage = () => {
             <span className="font-bold text-xl">{categoryName}</span>
           </div>
           <div className="w-1/2 flex justify-end">
-            <span className="font-bold text-xl">{(numberOfQuestions-questions.length)+1} of {numberOfQuestions}</span>
+            <span className="font-bold text-xl">
+              {((progress.correctAnsweredWords.length+progress.incorrectAnsweredWords.length)+1) <= numberOfQuestions ? (progress.correctAnsweredWords.length+progress.incorrectAnsweredWords.length)+1 : numberOfQuestions} of {numberOfQuestions}
+            </span>
           </div>
         </div>
         {

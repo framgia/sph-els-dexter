@@ -68,7 +68,6 @@ export const QuizController = {
         message: "Your progress has been updated."
       })
     } catch (err) {
-      console.log(err)
       respondError(err, res)
     }
   },
@@ -76,168 +75,154 @@ export const QuizController = {
     try {
       const {categoryId, email} = req.body
 
-      if (!categoryId && !email) throw new ErrorException("categoryId and email is required.")
+      if (!categoryId || !email) throw new ErrorException("categoryId and email is required from payload.")
 
-      const userData: {_id: string} | null = await User.findOne<{_id: string}>({email}, "_id").exec()
+      // Getting userId based on email
+      const userDocument: IUser | null = await User.findOne<IUser>({email}).exec()
 
-      if (!userData) throw new Error("User not found.")
+      if (!userDocument || (userDocument && !userDocument._id)) throw new ErrorException("User does not exist.")
 
-      const userId = userData._id
-      const currentProgress: IUserQuiz | null = await UserQuiz.findOne<IUserQuiz>({
-        categoryId, userId
+      // Fetching the words for the category
+      const categoryDocument: ICategory | null = await Category.findById<ICategory>(categoryId).exec()
+
+      if (!categoryDocument) throw new ErrorException("Record for this category is wiped out, unable to start this quiz.")
+
+      // Words with options
+      const words: IWord[] = categoryDocument.words && categoryDocument.words.length
+        ? (await Promise.all([...categoryDocument.words.map((word: string) => Word.findById(word))]) as IWord[])
+          .map((word: IWord) => {
+            word._id = word._id?.toString()
+
+            return word
+          })
+        : []
+
+      const totalQuestions: number = words.length
+
+      // Creating current progress record based on the words found on categoryDocument query
+      const currentProgress: IQuizProgress = {
+        answeredAt: new Date(),
+        currentScore: 0,
+        latestProgress: true,
+        correctAnsweredWords: [],
+        incorrectAnsweredWords: [],
+        unansweredWords: categoryDocument.words && categoryDocument.words.length
+          ? [...new Set([...categoryDocument.words.map((word: string) => word.toString())])]
+          : []
+      }
+
+      // Checking if there is a recorded quiz for this student and category
+      const quizDocument: IUserQuiz | null = await UserQuiz.findOne<IUserQuiz>({
+        categoryId,
+        userId: userDocument._id
       }).exec()
 
-      if (currentProgress) {
-        /** Get latest progress */
-        const foundProgress: IQuizProgress | undefined = currentProgress.progress && currentProgress.progress.find((item: IQuizProgress) => item.latestProgress)
-        const progress: IQuizProgress | undefined = currentProgress.progress
-          ? foundProgress ?? undefined
-          : undefined
+      // Check if there is already a record
+      if (quizDocument && quizDocument._id) {
+        // Check the progress history
+        if (quizDocument.progress && quizDocument.progress.length) {
+          // Get last progress record
+          const lastProgress: IQuizProgress = quizDocument.progress[quizDocument.progress.length-1]
 
-        const previousProgress: IQuizProgress | undefined = currentProgress.progress 
-          ? currentProgress.progress[currentProgress.progress.length-1]
-          : undefined
+          const [
+            lastUnansweredQuestions, 
+            lastCorrecAnsweredQuestions,
+            lastIncorrectAnsweredQuestions
+          ]: [string[], string[], string[]] = [
+            lastProgress.unansweredWords,
+            lastProgress.correctAnsweredWords,
+            lastProgress.incorrectAnsweredWords
+          ]
+          
+          const previousUnansweredLength: number = lastUnansweredQuestions.length
 
-        const wordsTouched: string[] = previousProgress
-          ? [...previousProgress.correctAnsweredWords, ...previousProgress.incorrectAnsweredWords]
-          : []
+          const touchedQuestions: string[] = [...new Set([...lastCorrecAnsweredQuestions, ...lastIncorrectAnsweredQuestions])] as string[]
+          
+          // Trim off the questions/words to send to client based on last progress touched questions
+          touchedQuestions.forEach((wordId: string) => {
+            const wordIndex: number | undefined = words.findIndex((word: IWord) => word._id && word._id.toString() === wordId)
 
-        const unansweredWords: string[] = progress 
-          ? progress.unansweredWords.length
-          ? progress.unansweredWords.map((item: string | undefined) => item!.toString())
-          : []
-          : []
-        
-        let finalUnansweredWords: string[] = unansweredWords
-        const unansweredWordsCount: number = finalUnansweredWords.length
+            if (wordIndex > -1) {
+              // Remove this word from the list of words to send to FE
+              words.splice(wordIndex, 1)
+            }
+          })
 
-        /**
-         * 
-         * Get category words just to check
-         * if there are newly added/removed 
-         * words from this category
-         */
-        const wordData: {words: string[]} | null = await Category.findById<{words: string[]}>(categoryId, "words").exec()
-
-        if (wordData) {
-          wordsTouched.forEach((item: string) => {
-            if (wordData && wordData.words) {
-              if (wordData.words.find((x: string) => x === item)) {
-                wordData.words.splice(wordData.words.findIndex((x: string) => x === item), 1)
+          // Check if new word have been added for this category
+          words.forEach((word: IWord) => {
+            if (word._id) {
+              if (!lastUnansweredQuestions.includes(word._id.toString())) {
+                if (!touchedQuestions.includes(word._id.toString())) {
+                  lastUnansweredQuestions.push(word._id.toString())
+                }
               }
             }
           })
 
-          /** There are words set for this category, compare with the saved unanswered word */
-          if (wordData.words.length > finalUnansweredWords.length) { /** <-- This means that a new word is added to this category */
-            wordData.words.forEach((item: string) => {
-              if (!finalUnansweredWords.includes(item)) {
-                finalUnansweredWords = [...finalUnansweredWords, item]
-              }
-            })
-          } else if (wordData.words.length < finalUnansweredWords.length) {  /** <-- This means that a new word is removed from this category */
-            unansweredWords.forEach((item: string | undefined) => {
-              if (!wordData.words.includes(item!)) {
-                finalUnansweredWords.splice(finalUnansweredWords.findIndex((x: string | undefined) => x! === item), 1)
-              }
+          // Check if a word has been removed from this category
+          lastUnansweredQuestions.forEach((item: string) => {
+            if (!words.find((word: IWord) => word._id && word._id.toString() === item.toString())) {
+              lastUnansweredQuestions.splice(lastUnansweredQuestions.findIndex((x: string) => x === item), 1)
+            }
+          })
+
+          // Check if unanswered questions have changed
+          if (previousUnansweredLength !== lastUnansweredQuestions.length) {
+            // update progress object to be sent to FE
+            lastProgress.unansweredWords = lastUnansweredQuestions
+
+            quizDocument.progress[quizDocument.progress.length-1].unansweredWords = lastUnansweredQuestions
+
+            // update userquiz document
+            await UserQuiz.findByIdAndUpdate(quizDocument._id, {
+              $set: {progress: quizDocument.progress}
             })
           }
-        } else {
-          /** No words found, this category is updated and words are removed. */
-          finalUnansweredWords = []
-        }
-
-        /** Listen to a change un unanswered words */
-        if (unansweredWordsCount !== finalUnansweredWords.length) {
-          await UserQuiz.updateOne<IUserQuiz>({categoryId, userId}, {
-            progress: [
-              ...currentProgress.progress!.map((item: IQuizProgress) => {
-                if (item.latestProgress) {
-                  item.unansweredWords = finalUnansweredWords
-                }
-
-                return item
-              })
-            ]
-          })
-        }
- 
-        if (finalUnansweredWords) {
-          const wordsToDisplay = finalUnansweredWords
-            .map((item: string | undefined) => Word.findById(item).exec())
-
-          const words: IWord[] | undefined = await Promise.all(wordsToDisplay) as unknown as IWord[]
 
           return res.status(EHttpStatusCode.OK).send({
             data: {
-              progress,
-              words
+              progress: lastProgress,
+              words,
+              totalQuestions
             },
-            message: "Past data is successfully fetched."
+            message: "Quiz progress retained."
           })
         }
 
-        return res.status(EHttpStatusCode.OK).send({
-          data: {
-            progress,
-            words: []
-          },
-          message: "Past data is successfully fetched."
-        })
-      }
-
-      /** It execution gets here, that means that this is a new quiz. */
-      const categoryWords: {words?: string[]} | null = await Category.findById<{words?: string[]}>(categoryId, "words")
-
-      if (categoryWords) {
-        const words: IWord[] | null = categoryWords.words ? await Promise.all([
-          ...categoryWords.words.map((item: string) => {
-            return Word.findById(item).exec()
-          }) as unknown as IWord[]
-        ]) : null
-
-        const unansweredWords: string[] = words
-          ? words.length
-          ? [...words].filter((item: IWord) => item._id).map((item: IWord) => item._id && item._id.toString()) as string[]
-          : []
-          : []
-
-        const quizProgress: IQuizProgress = {
-          latestProgress: true,
-          unansweredWords,
-          currentScore: 0,
-          correctAnsweredWords: [],
-          incorrectAnsweredWords: [],
-          answeredAt: new Date()
-        }
-
-        const newQuiz = new UserQuiz({
+        // Quiz is previously recorded but there is no progress history yet, save progress with default values
+        const quiz: IUserQuiz = {
           categoryId,
-          userId,
-          progress: quizProgress
-        })
-  
-        const hasBeenRecorded = await UserQuiz.findOne({categoryId, userId})
-
-        if (!hasBeenRecorded) {
-          await newQuiz.save()
+          userId: userDocument._id!,
+          progress: [currentProgress]
         }
-  
+
+        // To avoid duplicates
+        await UserQuiz.findOneAndUpdate({categoryId, userId: userDocument._id}, quiz, {upsert: true})
+
         return res.status(EHttpStatusCode.OK).send({
           data: {
-            progress: undefined,
-            words
+            progress: currentProgress,
+            words,
+            totalQuestions
           },
-          message: "Quiz started."
+          message: "Initial progress saved."
         })
       }
+
+      // This is a new quiz, no record yet (to avoid duplicate, I used findOneAndUpdate with upsert enabled)
+      await UserQuiz.findOneAndUpdate(
+        {categoryId, userId: userDocument._id},
+        {categoryId, userId: userDocument._id, progress: [currentProgress]},
+        {upsert: true}  
+      )
 
       res.status(EHttpStatusCode.OK).send({
         data: {
-          progress: undefined,
-          words: []
+          progress: currentProgress,
+          words,
+          totalQuestions
         },
-        message: "No words for this category."
+        message: "Quiz is successfully started."
       })
     } catch (err) {
       respondError(err, res)
