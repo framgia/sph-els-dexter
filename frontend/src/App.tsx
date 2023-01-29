@@ -6,9 +6,10 @@ import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import {
   LoginPage, SignupPage, DashboardPage, 
-  ProfilePage, WordPage, CategoryPage
+  ProfilePage, WordPage, CategoryPage,
+  QuizPage
 } from "./pages"
-import {ERouteNames} from "./enums"
+import {ERouteNames, ERouteParams} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
 import {RootState} from "./redux"
 import {slices} from "./redux/slice-collection"
@@ -58,42 +59,45 @@ function App() {
   })
 
   return (
-    <CookiesProvider>
-      <div className="w-screen min-h-full h-screen">
-        <div className="w-full w-full space-y-8">
-          <BrowserRouter>
-            {
-              isLoggedIn ? (
-                <ProtectedLayout>
+    <React.StrictMode>
+      <CookiesProvider>
+        <div className="w-screen min-h-full h-screen">
+          <div className="w-full w-full space-y-8">
+            <BrowserRouter>
+              {
+                isLoggedIn ? (
+                  <ProtectedLayout>
+                    <Routes>
+                      <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
+                      <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
+                      {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null}
+                      <Route path={ERouteNames.CATEGORY_PAGE} element={<CategoryPage/>} />
+                      <Route path={`${ERouteNames.QUIZ_PAGE}/:${ERouteParams.CATEGORYID}/:${ERouteParams.CATEGORYNAME}`} element={<QuizPage />} />
+                    </Routes>
+                  </ProtectedLayout>
+                ) : (
                   <Routes>
-                    <Route path={ERouteNames.DASHBOARD_PAGE} element={<DashboardPage/>} />
-                    <Route path={ERouteNames.PROFILE_PAGE} element={<ProfilePage/>} />
-                    {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null}
-                    <Route path={ERouteNames.CATEGORY_PAGE} element={<CategoryPage/>} />
+                    <Route path={ERouteNames.ROOT_PAGE} element={<LoginPage/>} />
+                    <Route path={ERouteNames.SIGNUP_PAGE} element={<SignupPage/>} />
                   </Routes>
-                </ProtectedLayout>
-              ) : (
-                <Routes>
-                  <Route path={ERouteNames.ROOT_PAGE} element={<LoginPage/>} />
-                  <Route path={ERouteNames.SIGNUP_PAGE} element={<SignupPage/>} />
-                </Routes>
-              )
-            }
-          </BrowserRouter>
-        </div>
+                )
+              }
+            </BrowserRouter>
+          </div>
 
-      </div>
-      <ToastContainer 
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        draggable
-        pauseOnHover
-      />
-    </CookiesProvider>
+        </div>
+        <ToastContainer 
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          draggable
+          pauseOnHover
+        />
+      </CookiesProvider>
+    </React.StrictMode>
   );
 }
 

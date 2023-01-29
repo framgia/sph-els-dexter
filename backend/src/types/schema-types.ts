@@ -47,3 +47,27 @@ export interface IWord extends ITimestamp, IActors {
   word: string;
   options: IWordOptions[];
 }
+
+export interface ICategory extends ITimestamp, IActors {
+  _id?: string;
+  title: string;
+  description: string;
+  status?: string;
+  words?: string[];
+}
+
+export interface IQuizProgress {
+  latestProgress: boolean;
+  unansweredWords: string[];
+  currentScore: number;
+  correctAnsweredWords: string[];
+  incorrectAnsweredWords: string[];
+  answeredAt: Date;
+}
+
+export interface IUserQuiz extends ITimestamp {
+  _id?: string;
+  userId: string;
+  categoryId: string;
+  progress?: IQuizProgress[];
+}

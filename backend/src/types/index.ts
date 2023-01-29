@@ -1,9 +1,14 @@
-import {IUser, IUserSession, IAuditLogs, IWordsLearned, IWord, IWordOptions} from "./schema-types"
+import {
+  IUser, IUserSession, IAuditLogs, IWord, 
+  IWordOptions, ICategory, IWordsLearned,
+  IUserQuiz, IQuizProgress
+} from "./schema-types"
 import {ITokenBody} from "./token"
 import {ITypedRequestBody} from "./generic"
 
 export {
-  IUser, IUserSession, IWordsLearned,
+  IUser, IUserSession, IWord, IWordOptions,
   ITokenBody, IAuditLogs, ITypedRequestBody,
-  IWord, IWordOptions
+  ICategory, IWordsLearned, IUserQuiz,
+  IQuizProgress
 }

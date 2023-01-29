@@ -3,9 +3,17 @@ import {Location, useLocation, Link} from "react-router-dom"
 import {useSelector} from "react-redux"
 import {Cookies} from "react-cookie"
 import Modal from "react-modal"
+import {AxiosResponse} from "axios"
 import {RootState} from "./../../redux"
 import {slices} from "./../../redux/slice-collection"
-import {ERouteNames} from "./../../enums"
+import {ERouteNames, EEndpoints} from "./../../enums"
+import {IApiResponse} from "./../../types"
+import {api} from "./../../configs"
+import {useToast} from "./../../hooks"
+import {IUserDetails} from "../../redux/user/user-states"
+import {verifyToken} from "../../utils"
+
+Modal.setAppElement("#root")
 
 Modal.setAppElement("#root")
 
@@ -14,6 +22,7 @@ interface ILayoutProps {
 }
 
 const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
+  const {showToast} = useToast()
   const location: Location = useLocation()
   const cookie = new Cookies()
 
@@ -25,7 +34,7 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Dashboard"
     : pathName === ERouteNames.PROFILE_PAGE
     ? "Profile"
-    : pathName === ERouteNames.QUIZ_PAGE
+    : pathName.includes(ERouteNames.QUIZ_PAGE)
     ? "Quiz"
     : pathName === ERouteNames.WORD_PAGE
     ? "Word"
@@ -33,14 +42,35 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Category"
     : null
 
-    const signOut = () => {
-      /** Call logout API here */
+    const reset = () => {
       cookie.remove("refresh_token")
 
       slices.datalog.reset()
       slices.session.logout()
 
       window.location.href = "/"
+    }
+
+    const signOut = async () => {
+      try {
+        const refreshToken = cookie.get("refresh_token")
+
+        if (!refreshToken) return reset()
+
+        const userDetails: IUserDetails = verifyToken(refreshToken) as IUserDetails
+
+        if (!userDetails) return reset()
+
+        const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.LOGOUT, {email: userDetails.email})
+      
+        showToast("success", message)
+        reset()
+      } catch (err) {
+        const error: Error = err as Error
+
+        console.error(err)
+        showToast("error", error.message ?? "Unable to logout, please check the logs for more details.")
+      }
     }
 
   return (
@@ -51,9 +81,6 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
           <ul className="text-base text-gray-700 pt-4 md:flex md:justify-between md:pt-0">
             <li>
               <Link to={ERouteNames.DASHBOARD_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Dashboard</Link>
-            </li>
-            <li>
-              <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Quiz</Link>
             </li>
             {
               role === "admin" ? (
