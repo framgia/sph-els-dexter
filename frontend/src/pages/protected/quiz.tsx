@@ -68,6 +68,12 @@ const QuizPage = () => {
 
       const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.SUBMIT_QUIZ, {...payload})
 
+      const parsedData: ILocalData[] = JSON.parse(localData)
+      parsedData.splice(parsedData.findIndex((x: ILocalData) => x.categoryId === categoryId && x.email === email))
+
+      console.log(parsedData)
+      localStorage.setItem("progress", JSON.stringify(parsedData))
+
       setProcessing(false)
       showToast("success", message)
       
@@ -193,6 +199,15 @@ const QuizPage = () => {
               setQuestions(data.words)
             }
           }
+        } else {
+          localStorage.setItem("progress", JSON.stringify([
+            ...parsedData,
+            {
+              categoryId,
+              email,
+              progress: [data.progress]
+            }
+          ]))
         }
       }
 
