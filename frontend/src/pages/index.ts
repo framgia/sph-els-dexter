@@ -6,9 +6,10 @@ import WordPage from "./protected/word"
 import CategoryPage from "./protected/category"
 import QuizPage from "./protected/quiz"
 import QuizResultPage from "./protected/quiz-result"
+import LessonPage from "./protected/lesson"
 
 export {
   LoginPage, SignupPage, DashboardPage, 
   ProfilePage, WordPage, CategoryPage,
-  QuizPage, QuizResultPage
+  QuizPage, QuizResultPage, LessonPage
 }

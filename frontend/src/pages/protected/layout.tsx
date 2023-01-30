@@ -40,6 +40,8 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Word"
     : pathName === ERouteNames.CATEGORY_PAGE
     ? "Category"
+    : pathName === ERouteNames.LESSON_PAGE
+    ? "Lesson"
     : pathName.includes(ERouteNames.QUIZ_RESULT)
     ? "Quiz Result"
     : null
@@ -93,6 +95,9 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
             }
             <li>
               <Link to={ERouteNames.CATEGORY_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Category</Link>
+            </li>
+            <li>
+              <Link to={ERouteNames.LESSON_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Lesson</Link>
             </li>
             <li>
               <Link to={ERouteNames.QUIZ_PAGE} className="py-2 block md:p-4 hover:text-purple-400">Settings</Link>

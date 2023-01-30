@@ -6,5 +6,6 @@ export enum ERouteNames {
   QUIZ_PAGE = "/quiz",
   WORD_PAGE = "/word",
   CATEGORY_PAGE = "/category",
-  QUIZ_RESULT = "/result"
+  QUIZ_RESULT = "/result",
+  LESSON_PAGE = "/lesson"
 }
