@@ -24,7 +24,7 @@ interface IUpdateCategoryPayload {
 interface IAnswerQuizPayload {
   categoryId: string;
   email: string;
-  progress: IQuizProgress
+  progress: IQuizProgress[]
 }
 
 interface IQuizResult {
@@ -100,7 +100,7 @@ export const QuizController = {
       respondError(err, res)
     }
   },
-  ANSWER_QUIZ: async (req: ITypedRequestBody<IAnswerQuizPayload>, res: Response) => {
+  SUBMIT_QUIZ: async (req: ITypedRequestBody<IAnswerQuizPayload>, res: Response) => {
     try {
       const {categoryId, email, progress}: IAnswerQuizPayload = req.body
 
@@ -112,32 +112,14 @@ export const QuizController = {
 
       const {_id: userId} = userData
 
-      /** This is assured that there is always a progress recorded for each user. */
-      const lastProgress: IUserQuiz = await UserQuiz.findOne<IUserQuiz>({categoryId, userId}) as IUserQuiz
-
-      const oldProgress: IQuizProgress[] | undefined = lastProgress.progress
-
-      const invalidateOldProgress: IQuizProgress[] = oldProgress
-        ? [...oldProgress.map((item: IQuizProgress) => {
-          item.latestProgress = false
-  
-          return item
-        })]
-        : []
-
-      await UserQuiz.findByIdAndUpdate<IUserQuiz>(lastProgress._id, {
+      await UserQuiz.findOneAndUpdate({categoryId, userId}, {
         $set: {
-          progress: invalidateOldProgress,
-          updatedAt: new Date()
+          progress
         }
-      })
-
-      await UserQuiz.findByIdAndUpdate<IUserQuiz>(lastProgress._id, {
-        $push: {progress}
-      })
+      }, {upsert: true})
 
       res.status(EHttpStatusCode.OK).send({
-        message: "Your progress has been updated."
+        message: "Quiz completed."
       })
     } catch (err) {
       respondError(err, res)
