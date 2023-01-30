@@ -47,3 +47,11 @@ export interface IWord extends ITimestamp, IActors {
   word: string;
   options: IWordOptions[];
 }
+
+export interface ICategory extends ITimestamp, IActors {
+  _id?: string;
+  title: string;
+  description: string;
+  status?: string;
+  words?: string[];
+}
