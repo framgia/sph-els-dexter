@@ -40,6 +40,8 @@ const ProtectedLayout: React.FC<ILayoutProps> = ({children}: ILayoutProps) => {
     ? "Word"
     : pathName === ERouteNames.CATEGORY_PAGE
     ? "Category"
+    : pathName.includes(ERouteNames.QUIZ_RESULT)
+    ? "Quiz Result"
     : null
 
     const reset = () => {

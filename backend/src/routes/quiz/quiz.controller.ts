@@ -1,6 +1,6 @@
 import {Request, Response} from "express"
 import {EHttpStatusCode} from "../../enums";
-import {ITypedRequestBody, IWordOptions, ICategory, IUserQuiz, IQuizProgress, IWord, IUser} from "./../../types"
+import {ITypedRequestBody, IWordOptions, ICategory, IUserQuiz, IQuizProgress, IWord, IUser, IUserAnswer, ITypedResponse} from "./../../types"
 import {ErrorException, respondError} from "./../../utils"
 import {Word, Category, UserQuiz, User} from "./../../schemas"
 
@@ -27,7 +27,79 @@ interface IAnswerQuizPayload {
   progress: IQuizProgress
 }
 
+interface IQuizResult {
+  result: {
+    score: number;
+    total: number;
+  };
+  answers: IUserAnswer[];
+}
+
 export const QuizController = {
+  FETCH_RESULT: async (
+    req: ITypedRequestBody<{categoryId: string; email: string;}>, 
+    res: ITypedResponse
+  ) => {
+    try {
+      const {categoryId, email} = req.body
+
+      if (!categoryId || !email) throw new ErrorException("categoryId and email is required from payload.")
+
+      // get user's details
+      const userData: IUser | null = await User.findOne<IUser>({email}, "_id").exec()
+
+      if (!userData || (userData && !userData._id)) throw new ErrorException("User not found.")
+
+      // get category words
+      const categoryData: ICategory | null = await Category.findById<ICategory>(categoryId).exec()
+
+      if (!categoryData) throw new ErrorException("Category does not exist.")
+
+      const words: IWord[] = categoryData.words
+        ? await Promise.all(categoryData.words.map((word: string) => Word.findById(word).exec())) as IWord[]
+        : []
+
+      if (!words.length) throw new ErrorException("There are no words set for this category.")
+
+      const result: IQuizResult = {
+        answers: [],
+        result: {
+          score: 0,
+          total: words.length
+        }
+      }
+
+      // get quiz result
+      const quizData: IUserQuiz | null = await UserQuiz.findOne<IUserQuiz>({
+        categoryId, 
+        userId: userData._id
+      }).exec()
+
+      if (!quizData) return res.status(EHttpStatusCode.OK).send({
+        message: "Result for this quiz not found.",
+      })
+
+      if (!quizData.progress) throw new ErrorException("No progress is recorded for this quiz.")
+
+      const lastProgress: IQuizProgress = quizData.progress[quizData.progress.length-1]
+
+      result.result.score = lastProgress.currentScore
+      result.answers = lastProgress.answers
+
+      const wordIds: string[] = lastProgress.answers.map((answer: IUserAnswer) => answer.wordId)
+      const wordsQuery: IWord[] | null = await Promise.all(wordIds.map((word: string) => Word.findById(word, "word").exec())) as IWord[]
+
+      res.status(EHttpStatusCode.OK).send({
+        data: {
+          result, 
+          words: wordsQuery
+        },
+        message: "Quiz result is successfully fetched."
+      })
+    } catch (err) {
+      respondError(err, res)
+    }
+  },
   ANSWER_QUIZ: async (req: ITypedRequestBody<IAnswerQuizPayload>, res: Response) => {
     try {
       const {categoryId, email, progress}: IAnswerQuizPayload = req.body
@@ -104,6 +176,7 @@ export const QuizController = {
         answeredAt: new Date(),
         currentScore: 0,
         latestProgress: true,
+        answers: [],
         correctAnsweredWords: [],
         incorrectAnsweredWords: [],
         unansweredWords: categoryDocument.words && categoryDocument.words.length

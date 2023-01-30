@@ -27,7 +27,8 @@ const QuizPage = () => {
     incorrectAnsweredWords: [],
     currentScore: 0,
     latestProgress: true,
-    unansweredWords: []
+    unansweredWords: [],
+    answers: []
   })
   
   const displayIndex: number = 0  /** To control the display */
@@ -47,6 +48,7 @@ const QuizPage = () => {
       
       const progressData: IQuizProgress = {
         answeredAt: new Date(),
+        answers: [...progress!.answers, {wordId: question._id!, answer: optionSelected}],
         correctAnsweredWords: optionSelected.correctChoice 
           ? [...progress!.correctAnsweredWords, question._id] as string[]
           : [...progress!.correctAnsweredWords],
@@ -83,7 +85,7 @@ const QuizPage = () => {
       } else {
         showToast("success", "All questions have been completely answered.")
         /** Should navigate to the result page */
-        navigate(ERouteNames.CATEGORY_PAGE)
+        navigate(`${ERouteNames.QUIZ_RESULT}/${categoryId}/${categoryName}`)
       }
     } catch (err) {
       const error: Error = err as Error

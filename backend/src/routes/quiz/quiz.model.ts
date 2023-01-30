@@ -15,6 +15,8 @@ router.post("/start", QuizController.START_QUIZ)
 
 router.post("/answer", QuizController.ANSWER_QUIZ)
 
+router.post("/result", QuizController.FETCH_RESULT)
+
 router.get("/words/list", QuizController.WORD_LIST)
 
 router.get("/category/list", QuizController.CATEGORY_LIST)

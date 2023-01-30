@@ -5,5 +5,6 @@ export enum ERouteNames {
   PROFILE_PAGE = "/profile",
   QUIZ_PAGE = "/quiz",
   WORD_PAGE = "/word",
-  CATEGORY_PAGE = "/category"
+  CATEGORY_PAGE = "/category",
+  QUIZ_RESULT = "/result"
 }

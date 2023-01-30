@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css"
 import {
   LoginPage, SignupPage, DashboardPage, 
   ProfilePage, WordPage, CategoryPage,
-  QuizPage
+  QuizPage, QuizResultPage
 } from "./pages"
 import {ERouteNames, ERouteParams} from "./enums"
 import {useSelector, useDispatch} from "react-redux"
@@ -73,6 +73,7 @@ function App() {
                       {role === "admin" ? <Route path={ERouteNames.WORD_PAGE} element={<WordPage/>} /> : null}
                       <Route path={ERouteNames.CATEGORY_PAGE} element={<CategoryPage/>} />
                       <Route path={`${ERouteNames.QUIZ_PAGE}/:${ERouteParams.CATEGORYID}/:${ERouteParams.CATEGORYNAME}`} element={<QuizPage />} />
+                      <Route path={`${ERouteNames.QUIZ_RESULT}/:${ERouteParams.CATEGORYID}/:${ERouteParams.CATEGORYNAME}`} element={<QuizResultPage />} />
                     </Routes>
                   </ProtectedLayout>
                 ) : (
