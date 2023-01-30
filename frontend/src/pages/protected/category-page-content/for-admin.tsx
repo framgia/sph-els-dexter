@@ -85,7 +85,7 @@ const AdminCategoryPage = () => {
             }
           }
 
-          const removeDuplicate = item.words ? [...new Set(item.words)] : []
+          const removeDuplicate = item.words ? [...new Set([...item.words])] : []
           item.words = removeDuplicate
 
           return item
@@ -101,7 +101,7 @@ const AdminCategoryPage = () => {
             }
           }
 
-          const removeDuplicate = item.words ? [...new Set(item.words)] : []
+          const removeDuplicate = item.words ? [...new Set([...item.words])] : []
           item.words = removeDuplicate
 
           return item

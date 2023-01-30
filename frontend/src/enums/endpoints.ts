@@ -16,5 +16,5 @@ export enum EEndpoints {
   UPDATE_CATEGORY = "/quiz/category/edit",
   DELETE_CATEGORY = "/quiz/category/delete",
   START_QUIZ = "/quiz/start",
-  ANSWER_QUIZ = "/quiz/answer"
+  SUBMIT_QUIZ = "/quiz/submit"
 }

@@ -59,12 +59,17 @@ const QuizPage = () => {
       if (!data) throw new Error("Local progress is wiped out from local storage.")
 
       const localProgress: IQuizProgress[] = data.progress
+      const payload = {
+        categoryId,
+        email,
+        progress: localProgress
+      }
 
-    // const {data: {data: responseData, message}}: AxiosResponse<IApiResponse<{
-  //   progress: IQuizProgress;
-  //   totalQuestions: number;
-  //   words: IWord[];
-  // }>> = await api.post(EEndpoints.ANSWER_QUIZ, {...payload})
+      const {data: {message}}: AxiosResponse<IApiResponse<never>> = await api.post(EEndpoints.SUBMIT_QUIZ, {...payload})
+
+      setProcessing(false)
+      showToast("success", message)
+      // navigate here
     } catch (err) {
       const error: Error = err as Error
       setProcessing(false)
@@ -173,6 +178,10 @@ const QuizPage = () => {
             setProgress(localProgress)
             setNumberOfQuestions(data.totalQuestions)
     
+            if (!localProgress.unansweredWords.length) {
+              setShowFinishBtn(true)
+            }
+
             if (answeredWords.length) {
               setQuestions([
                 ...data.words.filter((item: IWord) => item && item._id ? !answeredWords.includes(item._id) : false)

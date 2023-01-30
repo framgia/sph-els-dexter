@@ -13,7 +13,7 @@ router.post("/words/data", QuizController.WORD_DATA)
 
 router.post("/start", QuizController.START_QUIZ)
 
-router.post("/answer", QuizController.ANSWER_QUIZ)
+router.post("/submit", QuizController.SUBMIT_QUIZ)
 
 router.get("/words/list", QuizController.WORD_LIST)
 
