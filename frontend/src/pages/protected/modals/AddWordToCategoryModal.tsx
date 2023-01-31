@@ -19,11 +19,6 @@ interface IModalData {
   word: string;
 }
 
-interface IModalData {
-  _id?: string;
-  word: string;
-}
-
 interface IModalComponentProp {
   setIsOpen: (state: boolean) => void;
   data?: ITableData;
